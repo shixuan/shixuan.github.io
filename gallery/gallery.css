@@ -1,0 +1,117 @@
+.card-content > .title.is-3 {
+  display: none;
+}
+.gallery-header {
+  text-align: center;
+  margin: .5rem 0 1.75rem;
+}
+.gallery-title {
+  font-family: 'Cinzel', serif;
+  font-weight: 400;
+  font-size: 2.6rem;
+  letter-spacing: .08em;
+  margin: 0 0 .4rem;
+  color: #333;
+}
+.gallery-meta {
+  font-size: .85rem;
+  color: #999;
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+}
+.gallery-meta span:empty {
+  display: none;
+}
+.gallery-meta span:empty + .gallery-meta-sep {
+  display: none;
+}
+.gallery-meta-sep {
+  color: #ccc;
+}
+.gallery-upload-wrap {
+  margin-top: 1rem;
+}
+.gallery-upload-btn {
+  display: inline-block;
+  padding: .35rem 1.4rem;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #888;
+  font-size: .85rem;
+  text-decoration: none;
+  transition: background .2s, border-color .2s, color .2s;
+}
+.gallery-upload-btn:hover {
+  background: #f5f5f5;
+  border-color: #bbb;
+  color: #555;
+}
+.justified-gallery {
+  margin-top: .5rem;
+}
+.gallery-controls {
+  margin: 1.5rem 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .75rem;
+  font-size: .95rem;
+}
+.gallery-controls button {
+  padding: .4rem 1.5rem;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+  transition: background .2s, border-color .2s;
+}
+.gallery-controls button:hover:not(:disabled) {
+  background: #f5f5f5;
+  border-color: #bbb;
+}
+.gallery-controls button:disabled {
+  opacity: .35;
+  cursor: default;
+}
+.gallery-section-nav {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+.gallery-section-nav .section-info {
+  min-width: 4rem;
+  text-align: center;
+  color: #888;
+}
+
+/* Caption inside lightGallery */
+.lg-cap-zh {
+  font-size: 1rem;
+  color: #fff;
+  margin: 0 0 4px;
+}
+.lg-cap-en {
+  font-size: .85rem;
+  color: #bbb;
+  margin: 0;
+  font-style: italic;
+}
+/* sub-html 固定高度，避免 caption 出现时布局跳动；!important 覆盖 LG 的内联 display:none */
+.lg-sub-html {
+  display: block !important;
+  min-height: 2.4rem;
+}
+/* Click image to toggle UI visibility */
+.lg-outer .lg-toolbar,
+.lg-outer .lg-actions,
+.lg-outer .lg-sub-html {
+  transition: opacity 0.25s;
+}
+.lg-outer.lg-ui-hidden .lg-toolbar,
+.lg-outer.lg-ui-hidden .lg-actions,
+.lg-outer.lg-ui-hidden .lg-sub-html {
+  opacity: 0;
+  pointer-events: none;
+}
