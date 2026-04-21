@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>ADR 0005 — Game Card 框架独立为 npm 包 arcade-shelf - Logs</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="Logs"><meta name="msapplication-TileImage" content="/img/favicon.ico"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Logs"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="ContextADR 0004 里搭的 game-card 框架本来是博客内嵌的一坨东西：widgets&amp;#x2F;game-card.jsx + source&amp;#x2F;js&amp;#x2F;game-card.js + source&amp;#x2F;js&amp;#x2F;games&amp;#x2F;*.js + scripts&amp;#x2F;inject-css.js 自动扫描。能跑，但加完 minesweeper 之后有个不对劲的感觉 — 这套”自描述游戏 + SSR shell + 模"><meta property="og:type" content="blog"><meta property="og:title" content="ADR 0005 — Game Card 框架独立为 npm 包 arcade-shelf"><meta property="og:url" content="http://shixuan.github.io/adr/0005-arcade-shelf-extraction.html"><meta property="og:site_name" content="Logs"><meta property="og:description" content="ContextADR 0004 里搭的 game-card 框架本来是博客内嵌的一坨东西：widgets&amp;#x2F;game-card.jsx + source&amp;#x2F;js&amp;#x2F;game-card.js + source&amp;#x2F;js&amp;#x2F;games&amp;#x2F;*.js + scripts&amp;#x2F;inject-css.js 自动扫描。能跑，但加完 minesweeper 之后有个不对劲的感觉 — 这套”自描述游戏 + SSR shell + 模"><meta property="og:locale" content="en_US"><meta property="og:image" content="http://shixuan.github.io/img/og_image.png"><meta property="article:published_time" content="2026-04-20T00:00:00.000Z"><meta property="article:author" content="shixuan"><meta property="twitter:card" content="summary"><meta property="twitter:image:src" content="http://shixuan.github.io/img/og_image.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://shixuan.github.io/adr/0005-arcade-shelf-extraction.html"},"headline":"ADR 0005 — Game Card 框架独立为 npm 包 arcade-shelf","image":["http://shixuan.github.io/img/og_image.png"],"datePublished":"2026-04-20T00:00:00.000Z","author":{"@type":"Person","name":"shixuan"},"publisher":{"@type":"Organization","name":"Logs","logo":{"@type":"ImageObject","url":"http://shixuan.github.io/img/logo.gif"}},"description":"ContextADR 0004 里搭的 game-card 框架本来是博客内嵌的一坨东西：widgets&#x2F;game-card.jsx + source&#x2F;js&#x2F;game-card.js + source&#x2F;js&#x2F;games&#x2F;*.js + scripts&#x2F;inject-css.js 自动扫描。能跑，但加完 minesweeper 之后有个不对劲的感觉 — 这套”自描述游戏 + SSR shell + 模"}</script><link rel="canonical" href="http://shixuan.github.io/adr/0005-arcade-shelf-extraction.html"><link rel="icon" href="/img/favicon.ico"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0/css/all.css"><link data-pjax rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link data-pjax rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" defer></script><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/css/justifiedGallery.min.css"><script src="https://www.googletagmanager.com/gtag/js?id=UA-175447554-1" async></script><script>window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+    
+        gtag('config', 'UA-175447554-1');</script><!--!--><!--!--><style>.pace{-webkit-pointer-events:none;pointer-events:none;-webkit-user-select:none;-moz-user-select:none;user-select:none}.pace-inactive{display:none}.pace .pace-progress{background:#3273dc;position:fixed;z-index:2000;top:0;right:100%;width:100%;height:2px}</style><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><!-- hexo injector head_end start --><link rel="stylesheet" href="/css/custom.css?v=bae54b64"><link rel="stylesheet" href="https://unpkg.com/arcade-shelf@0.2.0/dist/style.css"><link rel="stylesheet" href="/css/arcade-shelf-override.css?v=722793b0"><script>
+  (function () {
+      function switchTab() {
+          if (!location.hash) {
+            return;
+          }
+
+          const id = '#' + CSS.escape(location.hash.substring(1));
+          const $tabMenu = document.querySelector(`.tabs a[href="${id}"]`);
+          if (!$tabMenu) {
+            return;
+          }
+
+          const $tabMenuContainer = $tabMenu.parentElement.parentElement;
+          Array.from($tabMenuContainer.children).forEach($menu => $menu.classList.remove('is-active'));
+          Array.from($tabMenuContainer.querySelectorAll('a'))
+              .map($menu => document.getElementById($menu.getAttribute("href").substring(1)))
+              .forEach($content => $content.classList.add('is-hidden'));
+
+          if ($tabMenu) {
+              $tabMenu.parentElement.classList.add('is-active');
+          }
+          const $activeTab = document.querySelector(id);
+          if ($activeTab) {
+              $activeTab.classList.remove('is-hidden');
+          }
+      }
+      switchTab();
+      window.addEventListener('hashchange', switchTab, false);
+  })();
+  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Logs" type="application/atom+xml">
+</head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.gif" alt="Logs" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">Home</a><a class="navbar-item" href="/archives">Archives</a><a class="navbar-item" href="/gallery">Gallery</a><a class="navbar-item" href="/about">About</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/shixuan/shixuan.github.io"><i class="fab fa-github"></i></a><a class="navbar-item is-hidden-tablet catalogue" title="Catalogue" href="javascript:;"><i class="fas fa-list-ul"></i></a><a class="navbar-item search" title="Search" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-8-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item">Posted&nbsp;<time dateTime="2026-04-20T00:00:00.000Z" title="4/20/2026, 12:00:00 AM">2026-04-20</time></span><span class="level-item">15 minutes read (About 2209 words)</span><span class="level-item" id="busuanzi_container_page_pv"><span id="busuanzi_value_page_pv">0</span>&nbsp;visits</span></div></div><h1 class="title is-3 is-size-4-mobile">ADR 0005 — Game Card 框架独立为 npm 包 arcade-shelf</h1><div class="content"><h1 id="Context"><a href="#Context" class="headerlink" title="Context"></a>Context</h1><p><a href="/adr/0004-game-card-framework.html">ADR 0004</a> 里搭的 game-card 框架本来是博客内嵌的一坨东西：<code>widgets/game-card.jsx</code> + <code>source/js/game-card.js</code> + <code>source/js/games/*.js</code> + <code>scripts/inject-css.js</code> 自动扫描。能跑，但加完 minesweeper 之后有个不对劲的感觉 — 这套”自描述游戏 + SSR shell + 模态运行时”的结构跟博客本身没关系，任何装了 Hexo/Jekyll/11ty/纯 HTML 的地方都能用。继续塞在博客里相当于把一个能独立存在的工具和一个 content site 绑死。</p>
+<p>所以抽出来，发成 npm 包 <a target="_blank" rel="noopener" href="https://github.com/shixuan/arcade-shelf"><code>arcade-shelf</code></a> — “a shelf for your mini games”。博客这边只保留壳和 init 代码，真正的 framework 从 unpkg CDN 拉。</p>
+<h1 id="Decision"><a href="#Decision" class="headerlink" title="Decision"></a>Decision</h1><p>arcade-shelf 用 Vite library mode 打包，同时产出 ESM (<code>dist/index.js</code>)、UMD (<code>dist/index.umd.cjs</code>)、rolled-up <code>.d.ts</code>、<code>dist/style.css</code>。公共 API：</p>
+<figure class="highlight ts"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> { createShelf, pong, minesweeper } <span class="keyword">from</span> <span class="string">'arcade-shelf'</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">'arcade-shelf/style.css'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> shelf = <span class="title function_">createShelf</span>({ <span class="attr">container</span>: <span class="string">'#games'</span>, <span class="attr">title</span>: <span class="string">"Let's play!"</span> });</span><br><span class="line">shelf.<span class="title function_">register</span>(pong).<span class="title function_">register</span>(minesweeper).<span class="title function_">mount</span>();</span><br></pre></td></tr></tbody></table></figure>
+
+<p>核心改动是把原来的 <code>window.GameRegistry</code> queue-stub 替换成 per-shelf 的闭包 registry — ES module 天然解决了加载顺序问题（import 即同步可用），不再需要 global 占位。游戏契约 (<code>Game</code> 接口) 和 0004 基本一致：<code>{ name, icon?, description?, order?, canvasSize?, footer?, init(canvas): GameHandle }</code>，deltaTime 归一化的 Pong 和带难度的 Minesweeper 作为内置参考实现一起 ship。</p>
+<p>博客这边的集成走 UMD + CDN 路线（Hexo 不是 bundler、也不想给博客多上一层构建）：</p>
+<ol>
+<li><code>widgets/game-card.jsx</code> SSR 只产出 <code>&lt;div class="arcade-shelf-mount" data-title="..." data-whitelist="..." data-order="..."&gt;</code></li>
+<li><code>scripts/inject-css.js</code> 从 unpkg 注入 <code>arcade-shelf@&lt;version&gt;/dist/style.css</code> 和 <code>index.umd.cjs</code>（带版本号 pin）</li>
+<li><code>source/js/arcade-shelf-init.js</code> 扫所有 <code>.arcade-shelf-mount</code>，读 data-* 配置，<code>createShelf().register(pong).register(minesweeper).mount()</code></li>
+<li><code>source/css/arcade-shelf-override.css</code> 把 arcade-shelf 自己的 card 边框/背景置空，避免跟 Icarus <code>.card.widget</code> 产生双层卡片</li>
+</ol>
+<p>升级 arcade-shelf：在 npm 上发新版，改 <code>inject-css.js</code> 里的 <code>ARCADE_SHELF_VERSION</code> 常量，重启 hexo server，完事。</p>
+<h1 id="Notes"><a href="#Notes" class="headerlink" title="Notes"></a>Notes</h1><h2 id="为什么发包-vs-git-submodule-vs-直接-copy"><a href="#为什么发包-vs-git-submodule-vs-直接-copy" class="headerlink" title="为什么发包 vs git submodule vs 直接 copy"></a>为什么发包 vs git submodule vs 直接 copy</h2><p>短期来看三种都能用，但发 npm 有两个长期好处：</p>
+<ul>
+<li><strong>版本号就是文档</strong> — <code>arcade-shelf@0.1.1</code> 这个字符串在 <code>inject-css.js</code> 里钉死，未来 npm registry 永远能 resolve 回当时那个 tarball。两年后回来调试，不用猜”当时用的是哪个 commit”。</li>
+<li><strong>unpkg 是免费的 CDN + 永久档案</strong> — 只要 npm 不删包，<code>https://unpkg.com/arcade-shelf@0.1.0/dist/...</code> 永远可用。博客不用自己托管 asset，也不用担心 CDN 到期。</li>
+</ul>
+<p>submodule 会让博客 repo 多一个 subtree 需要维护；直接 copy 没有版本化，upstream 改了不知道本地要不要同步。</p>
+<h2 id="SSR-shell-为什么还留着"><a href="#SSR-shell-为什么还留着" class="headerlink" title="SSR shell 为什么还留着"></a>SSR shell 为什么还留着</h2><p>0004 的 SSR shell 做了两件事：(a) 渲染卡片 chrome（颜色、圆角、阴影），(b) 把 yaml 配置序列化成 <code>data-*</code>。</p>
+<p>抽 arcade-shelf 之后 (a) 其实可以让 arcade-shelf 自己画，但博客这边的卡片 chrome 是 Icarus <code>.card.widget</code> 给的（要跟 profile card、subscribe card 视觉一致），没法让 arcade-shelf 替代。所以保留 SSR shell，让它只负责”产一个带 Icarus 外壳的挂载点”，arcade-shelf 在挂载点内部渲染 shelf 内容，外层用 override.css 把 arcade-shelf 的 card 自装饰擦掉。</p>
+<p>换个没有主题的站点（纯 HTML、Jekyll 裸奔），可以完全跳过 SSR shell，直接写 <code>&lt;div id="games"&gt;&lt;/div&gt;</code> 让 arcade-shelf 自己画卡片。README 里有这种用法的示例。</p>
+<h2 id="defer-注入顺序"><a href="#defer-注入顺序" class="headerlink" title="defer 注入顺序"></a><code>defer</code> 注入顺序</h2><p>UMD 脚本必须比 init 脚本先执行，因为 init 脚本引用 <code>window.ArcadeShelf</code>。<code>defer</code> 保证了两件事：HTML 解析完才跑、按 DOM 出现顺序执行。所以 <code>inject-css.js</code> 里的注入顺序就是执行顺序：</p>
+<figure class="highlight javascript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">hexo.<span class="property">extend</span>.<span class="property">injector</span>.<span class="title function_">register</span>(<span class="string">'body_end'</span>,</span><br><span class="line">  <span class="string">`&lt;script src="https://unpkg.com/arcade-shelf@<span class="subst">${V}</span>/dist/index.umd.cjs" defer&gt;&lt;/script&gt;`</span>);</span><br><span class="line">hexo.<span class="property">extend</span>.<span class="property">injector</span>.<span class="title function_">register</span>(<span class="string">'body_end'</span>,</span><br><span class="line">  <span class="string">`&lt;script src="/js/arcade-shelf-init.js?v=..." defer&gt;&lt;/script&gt;`</span>);</span><br></pre></td></tr></tbody></table></figure>
+
+<p>不用 <code>defer</code> 或者用 <code>async</code> 都会炸（async 执行顺序不保证）。</p>
+<h2 id="文件删掉了啥"><a href="#文件删掉了啥" class="headerlink" title="文件删掉了啥"></a>文件删掉了啥</h2><p>从博客 repo 删掉：</p>
+<ul>
+<li><code>source/js/game-card.js</code> — framework（现在在 arcade-shelf 里）</li>
+<li><code>source/js/games/pong.js</code> — 内置游戏（现在在 arcade-shelf 里）</li>
+<li><code>source/js/games/minesweeper.js</code> — 内置游戏</li>
+<li><code>source/js/games/</code> — 整个目录</li>
+<li><code>source/css/game-card.css</code> — shelf + modal 样式（现在在 arcade-shelf <code>dist/style.css</code>）</li>
+</ul>
+<p>新增：</p>
+<ul>
+<li><code>source/js/arcade-shelf-init.js</code> — 集成胶水</li>
+<li><code>source/css/arcade-shelf-override.css</code> — 卡中卡样式覆写</li>
+</ul>
+<p><code>widgets/game-card.jsx</code> 和 <code>scripts/inject-css.js</code> 保留但都精简了。</p>
+<h2 id="未来想加新游戏"><a href="#未来想加新游戏" class="headerlink" title="未来想加新游戏"></a>未来想加新游戏</h2><p>两条路：</p>
+<ul>
+<li><strong>发进 arcade-shelf</strong> — 写在 <code>src/games/&lt;name&gt;.ts</code>，PR 到 <a target="_blank" rel="noopener" href="https://github.com/shixuan/arcade-shelf">arcade-shelf repo</a>，发新版，更新博客的 <code>ARCADE_SHELF_VERSION</code>。适合通用游戏。</li>
+<li><strong>博客本地注册</strong> — 在 <code>source/js/arcade-shelf-init.js</code> 里定义 <code>const myGame = { name, icon, init, ... }</code>，然后 <code>shelf.register(myGame)</code>。完全不用动 arcade-shelf。适合跟博客内容耦合的游戏（比如”扫雷生成的雷区对应当天的博文数”这种奇葩玩法）。</li>
+</ul>
+<h2 id="preview-count-More-overlay-—-sidebar-空间管控"><a href="#preview-count-More-overlay-—-sidebar-空间管控" class="headerlink" title="preview_count + More overlay — sidebar 空间管控"></a><code>preview_count</code> + More overlay — sidebar 空间管控</h2><p>arcade-shelf 0.2 开始有三个内置游戏（pong / minesweeper / snake），以后大概率还会更多。但 Icarus 左栏就那么点宽，把所有游戏塞进 sidebar 会把 subscribe / toc 等 widget 挤下去。所以引入”紧凑模式”：sidebar 只显示前 N 个，底下一个 “more…” 按钮，点开浮层列出全部。</p>
+<p>核心约束是 <strong>arcade-shelf 不动</strong>。这个需求本质是”侧栏宽度受限”，是<strong>博客这一端</strong>的布局关切 —— ADR 0005 的前提就是 arcade-shelf 不该知道 Hexo / Icarus 存在。所以全部逻辑做在 init.js + override.css 里。</p>
+<p><strong>Config 形状</strong>：</p>
+<figure class="highlight yaml"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">game_card:</span></span><br><span class="line">    <span class="attr">position:</span> <span class="string">left</span></span><br><span class="line">    <span class="attr">type:</span> <span class="string">game-card</span></span><br><span class="line">    <span class="attr">title:</span> <span class="string">Let's</span> <span class="string">play!</span></span><br><span class="line">    <span class="attr">preview_count:</span> <span class="number">2</span>   <span class="comment"># 省略就全列，没有 more 按钮</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>不用 <code>preview: [Pong, Snake]</code> 硬写名字那种方案 —— 发新游戏每次都得改 yaml 太烦。用数字 “top N by order”，init.js 按每个游戏的 <code>order</code> 字段排序取前 N：</p>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> allGames = [<span class="variable constant_">AS</span>.<span class="property">pong</span>, <span class="variable constant_">AS</span>.<span class="property">minesweeper</span>, <span class="variable constant_">AS</span>.<span class="property">snake</span>].<span class="title function_">filter</span>(<span class="title class_">Boolean</span>);</span><br><span class="line"><span class="keyword">const</span> sorted = allGames.<span class="title function_">slice</span>().<span class="title function_">sort</span>(<span class="function">(<span class="params">a, b</span>) =&gt;</span> (a.<span class="property">order</span> ?? <span class="title class_">Inf</span>) - (b.<span class="property">order</span> ?? <span class="title class_">Inf</span>));</span><br><span class="line"><span class="keyword">const</span> preview = sorted.<span class="title function_">slice</span>(<span class="number">0</span>, N).<span class="title function_">map</span>(<span class="function"><span class="params">g</span> =&gt;</span> g.<span class="property">name</span>);</span><br><span class="line">shelf = <span class="variable constant_">AS</span>.<span class="title function_">createShelf</span>({ ..., <span class="attr">whitelist</span>: preview });</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>.filter(Boolean)</code> 是为了把<strong>版本 gate</strong> 做掉：博客 pin 在 0.1.x 时 <code>AS.snake</code> 是 undefined，自动被过滤；bump 到 0.2 之后它自己出现，init.js 完全不用改。</p>
+<p><strong>Single-modal UX</strong>：点 more → 浮层列全部 → 点游戏 → <strong>先拆掉浮层，再开游戏 modal</strong>。不 stack。关键是用 arcade-shelf 的<strong>公共导出</strong> <code>openGameModal(game, triggerBtn)</code>：</p>
+<figure class="highlight js"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">onListClick</span>(<span class="params">e</span>) {</span><br><span class="line">  <span class="keyword">const</span> btn = e.<span class="property">target</span>.<span class="title function_">closest</span>(<span class="string">'.game-card-more-game-btn'</span>);</span><br><span class="line">  <span class="keyword">const</span> game = games.<span class="title function_">find</span>(<span class="function"><span class="params">g</span> =&gt;</span> g.<span class="property">name</span> === btn.<span class="property">dataset</span>.<span class="property">gameName</span>);</span><br><span class="line">  <span class="title function_">closeMoreOverlay</span>();       <span class="comment">// 先 teardown</span></span><br><span class="line">  <span class="variable constant_">AS</span>.<span class="title function_">openGameModal</span>(game, btn); <span class="comment">// 再起游戏 modal</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这条路径不碰 arcade-shelf 内部的 list click dispatcher，走的是 library 明确 export 的入口 —— 等于把博客当成一个”composing consumer”，跟 React 用户写 <code>openGameModal</code> 打开游戏没任何区别。如果做两个 arcade-shelf 实例叠起来然后 intercept click，就会陷入”蜡烛两头烧”：既要懂 arcade-shelf 内部 event 路径，又要保证未来版本升级时它还能工作。</p>
+<p><strong>more 按钮的 SSR + 渐进增强</strong>：</p>
+<figure class="highlight jsx"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">{previewCount !== <span class="literal">null</span> &amp;&amp; (</span><br><span class="line">  <span class="language-xml"><span class="tag">&lt;<span class="name">button</span> <span class="attr">type</span>=<span class="string">"button"</span> <span class="attr">class</span>=<span class="string">"game-card-more-btn"</span> <span class="attr">hidden</span>&gt;</span>more…<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span></span><br><span class="line">)}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>hidden</code> 属性是关键。按钮在 HTML 里就有，但 JS 挂载成功之后才 unhide。两个好处：</p>
+<ul>
+<li>JS 失败 / arcade-shelf UMD 没加载，按钮不会<strong>挂尸</strong>在页面上让用户点了没反应。</li>
+<li>有剩余游戏（<code>sorted.length &gt; previewCount</code>）时才 unhide，没有时保持隐藏 —— 博客 pin 在 0.1.1 时 snake 没出现，<code>2 &gt; 2</code> false，more 按钮不显示；bump 到 0.2.0 后 <code>3 &gt; 2</code> true，自动出现。这也是个<strong>优雅降级点</strong>。</li>
+</ul>
+<p><strong>Overlay 自己写，不复用 arcade-shelf 的 modal</strong>：因为 arcade-shelf 的 modal API (<code>openGameModal</code>) 是”给你一个游戏、我帮你开一个 canvas”，不是”列一堆游戏让用户选”。语义不对。所以 overlay 是博客手写的 ~100 行：<code>&lt;ul&gt;</code> + <code>&lt;li&gt;</code> + 背景、Esc、backdrop click、close 按钮、<code>document.body.style.overflow</code> lock 这些常规模态窗逻辑。深色模式走 <code>@media (prefers-color-scheme: dark)</code>，跟 arcade-shelf 自身的配色 philosophy 对齐。</p>
+<h1 id="Implementation-Sketch"><a href="#Implementation-Sketch" class="headerlink" title="Implementation Sketch"></a>Implementation Sketch</h1><p>(as of 2026-04-21，会随代码漂移 — 文件本身是 canonical)</p>
+<p>博客里跟 arcade-shelf 相关的全部文件：</p>
+<ul>
+<li><code>widgets/game-card.jsx</code> — Inferno SSR，吐 <code>&lt;div class="arcade-shelf-mount" data-*&gt;</code> + 条件 <code>&lt;button class="game-card-more-btn" hidden&gt;</code></li>
+<li><code>scripts/inject-css.js</code> — <code>ARCADE_SHELF_VERSION</code> 常量 + unpkg 链接 + init script 注入</li>
+<li><code>source/js/arcade-shelf-init.js</code> — 扫 mount 元素、按 order 取 top N、挂 shelf、绑 more 按钮、render overlay、单 modal 切换逻辑</li>
+<li><code>source/css/arcade-shelf-override.css</code> — shelf 视觉融合覆写 + more 按钮 + overlay 全套样式（含 dark mode）</li>
+<li><code>_data/shared-widgets.yml</code> — 配置入口（<code>title</code>/<code>whitelist</code>/<code>order</code>/<code>preview_count</code>）</li>
+</ul>
+<p>arcade-shelf 包本身的代码在 <a target="_blank" rel="noopener" href="https://github.com/shixuan/arcade-shelf">github.com/shixuan/arcade-shelf</a>，README 里有公共 API、游戏契约、集成 recipes（React/Hexo/Jekyll/纯 HTML）。</p>
+</div><div class="article-licensing box"><div class="licensing-title"><p>ADR 0005 — Game Card 框架独立为 npm 包 arcade-shelf</p><p><a href="http://shixuan.github.io/adr/0005-arcade-shelf-extraction.html">http://shixuan.github.io/adr/0005-arcade-shelf-extraction.html</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>Author</h6><p>shixuan</p></div></div><div class="level-item is-narrow"><div><h6>Posted on</h6><p>2026-04-20</p></div></div><div class="level-item is-narrow"><div><h6>Licensed under</h6><p><a class="icons" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="icon fab fa-creative-commons"></i></a><a class="icons" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="icon fab fa-creative-commons-by"></i></a><a class="icons" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="icon fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><div class="addthis_inline_share_toolbox"></div><script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5f36627a4fb687b2" defer></script></article></div><div class="card"><div class="card-content"><h3 class="menu-label has-text-centered">Like this article? Support the author with</h3><div class="buttons is-centered"><a class="button donate" href="https://www.buymeacoffee.com/shixuan" target="_blank" rel="noopener" data-type="buymeacoffee"><span class="icon is-small"><i class="fas fa-coffee"></i></span><span>Buy me a coffee</span></a></div></div></div><div class="card" id="comments"><div class="card-content"><h3 class="title is-5">Comments</h3><script src="https://giscus.app/client.js" repo="shixuan/shixuan.github.io" data-repo="shixuan/shixuan.github.io" data-repo-id="MDEwOlJlcG9zaXRvcnkyMjY5MDc3OTE=" data-category-id="DIC_kwDODYZWj84CswDG" data-category="Announcements" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="top" data-theme="light" data-lang="en" data-loading="lazy" crossorigin="anonymous" async></script></div></div></div><div class="column column-left is-4-tablet is-4-desktop is-4-widescreen  order-1 is-sticky"><div class="card widget" id="toc" data-type="toc"><div class="card-content"><div class="menu"><h3 class="menu-label">Catalogue</h3><ul class="menu-list"><li><a class="level is-mobile" href="#Context"><span class="level-left"><span class="level-item">1</span><span class="level-item">Context</span></span></a></li><li><a class="level is-mobile" href="#Decision"><span class="level-left"><span class="level-item">2</span><span class="level-item">Decision</span></span></a></li><li><a class="level is-mobile" href="#Notes"><span class="level-left"><span class="level-item">3</span><span class="level-item">Notes</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#为什么发包-vs-git-submodule-vs-直接-copy"><span class="level-left"><span class="level-item">3.1</span><span class="level-item">为什么发包 vs git submodule vs 直接 copy</span></span></a></li><li><a class="level is-mobile" href="#SSR-shell-为什么还留着"><span class="level-left"><span class="level-item">3.2</span><span class="level-item">SSR shell 为什么还留着</span></span></a></li><li><a class="level is-mobile" href="#defer-注入顺序"><span class="level-left"><span class="level-item">3.3</span><span class="level-item">defer 注入顺序</span></span></a></li><li><a class="level is-mobile" href="#文件删掉了啥"><span class="level-left"><span class="level-item">3.4</span><span class="level-item">文件删掉了啥</span></span></a></li><li><a class="level is-mobile" href="#未来想加新游戏"><span class="level-left"><span class="level-item">3.5</span><span class="level-item">未来想加新游戏</span></span></a></li><li><a class="level is-mobile" href="#preview-count-More-overlay-—-sidebar-空间管控"><span class="level-left"><span class="level-item">3.6</span><span class="level-item">preview_count + More overlay — sidebar 空间管控</span></span></a></li></ul></li><li><a class="level is-mobile" href="#Implementation-Sketch"><span class="level-left"><span class="level-item">4</span><span class="level-item">Implementation Sketch</span></span></a></li></ul></div></div><style>#toc .menu-list > li > a.is-active + .menu-list { display: block; }#toc .menu-list > li > a + .menu-list { display: none; }</style><script src="/js/toc.js" defer></script></div></div><!--!--></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/img/logo.gif" alt="Logs" height="28"></a><p class="is-size-7"><span>&copy; 2026 shixuan</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a><br><span id="busuanzi_container_site_uv">Visited by <span id="busuanzi_value_site_uv">0</span> users</span></p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/shixuan"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("en");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script data-pjax src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="Back to top" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script data-pjax src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "This website uses cookies to improve your experience.",
+          dismiss: "Got it!",
+          allow: "Allow cookies",
+          deny: "Decline",
+          link: "Learn more",
+          policy: "Cookie Policy",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><script type="text/javascript" id="MathJax-script" async>MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      },
+      svg: {
+        fontCache: 'global'
+      },
+      chtml: {
+        matchFontHeight: false
+      }
+    };</script><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><!--!--><script data-pjax src="/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="Type something..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script data-pjax src="/js/insight.js" defer></script><script data-pjax>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"Type something...","untitled":"(Untitled)","posts":"Posts","pages":"Pages","categories":"Categories","tags":"Tags"});
+        });</script><!-- hexo injector body_end start --><script src="https://unpkg.com/arcade-shelf@0.2.0/dist/index.umd.cjs" defer></script><script src="/js/arcade-shelf-init.js?v=531064cb" defer></script><!-- hexo injector body_end end --></body></html>

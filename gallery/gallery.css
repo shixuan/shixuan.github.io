@@ -1,0 +1,146 @@
+.card-content > .title.is-3 {
+  display: none;
+}
+.gallery-header {
+  text-align: center;
+  margin: .5rem 0 1.75rem;
+}
+.gallery-title {
+  font-family: 'Cinzel', serif;
+  font-weight: 400;
+  font-size: 2.6rem;
+  letter-spacing: .08em;
+  margin: 0 0 .4rem;
+  color: #333;
+}
+.gallery-meta {
+  font-size: .85rem;
+  color: #999;
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+}
+.gallery-meta span:empty {
+  display: none;
+}
+.gallery-meta span:empty + .gallery-meta-sep {
+  display: none;
+}
+.gallery-meta-sep {
+  color: #ccc;
+}
+.gallery-upload-wrap {
+  margin-top: 1rem;
+}
+.gallery-upload-btn {
+  display: inline-block;
+  padding: .35rem 1.4rem;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #888;
+  font-size: .85rem;
+  text-decoration: none;
+  transition: background .2s, border-color .2s, color .2s;
+}
+.gallery-upload-btn:hover {
+  background: #f5f5f5;
+  border-color: #bbb;
+  color: #555;
+}
+.justified-gallery {
+  margin-top: .5rem;
+}
+
+/* Suppress JG's built-in entry animation — it re-fires on last-row re-justification
+   during norewind, causing already-visible images to flash. */
+#jg-gallery > a {
+  animation: none !important;
+}
+
+.gallery-loading {
+  text-align: center;
+  padding: 1.5rem 0;
+  color: #aaa;
+  font-size: .9rem;
+  letter-spacing: .05em;
+}
+
+.gallery-controls {
+  margin: 1.5rem 0 0;
+  display: flex;
+  justify-content: center;
+}
+.gallery-section-nav {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+.gallery-section-nav .section-info {
+  min-width: 4rem;
+  text-align: center;
+  color: #888;
+  font-size: .95rem;
+}
+.gallery-section-nav button {
+  padding: .4rem 1.5rem;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+  font-size: .95rem;
+  transition: background .2s, border-color .2s;
+}
+.gallery-section-nav button:hover:not(:disabled) {
+  background: #f5f5f5;
+  border-color: #bbb;
+}
+.gallery-section-nav button:disabled {
+  opacity: .35;
+  cursor: default;
+}
+
+/* Lightbox in-toolbar loading indicator */
+.lg-load-indicator {
+  color: #ccc;
+  font-size: .85rem;
+  line-height: 1;
+  padding: 0 .75rem;
+  align-self: center;
+  pointer-events: none;
+}
+
+/* Caption inside lightGallery */
+.lg-cap-zh {
+  font-size: 1rem;
+  color: #fff;
+  margin: 0 0 4px;
+}
+.lg-cap-en {
+  font-size: .85rem;
+  color: #bbb;
+  margin: 0;
+  font-style: italic;
+}
+/* sub-html 固定高度，避免 caption 出现时布局跳动；!important 覆盖 LG 的内联 display:none */
+.lg-sub-html {
+  display: block !important;
+  min-height: 2.4rem;
+}
+/* Click image to toggle UI visibility */
+.lg-outer .lg-toolbar,
+.lg-outer .lg-prev,
+.lg-outer .lg-next,
+.lg-outer .lg-sub-html,
+.lg-outer .lg-empty-html {
+  transition: opacity 0.25s;
+}
+.lg-outer.lg-ui-hidden .lg-toolbar,
+.lg-outer.lg-ui-hidden .lg-prev,
+.lg-outer.lg-ui-hidden .lg-next,
+.lg-outer.lg-ui-hidden .lg-sub-html,
+.lg-outer.lg-ui-hidden .lg-empty-html {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.25s !important;
+}
