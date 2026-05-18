@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>ADR 0001 — GitHub Actions 自动部署 - Logs</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="Logs"><meta name="msapplication-TileImage" content="/img/favicon.ico"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Logs"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="Context博客有两个仓库：  源仓（私有）— Hexo 项目本体，包含 source&amp;#x2F;_posts&amp;#x2F;、主题配置、deploy 脚本等 Pages 仓（公开）— shixuan&amp;#x2F;shixuan.github.io，存放 hexo generate 产出的静态文件，GitHub Pages 直接服务  源仓大体应该要私有(?) - 主要考虑的点是config文件能不能暴露出来：虽然扫了一遍里面没有"><meta property="og:type" content="blog"><meta property="og:title" content="ADR 0001 — GitHub Actions 自动部署"><meta property="og:url" content="http://shixuan.github.io/adr/0001-github-actions-deploy.html"><meta property="og:site_name" content="Logs"><meta property="og:description" content="Context博客有两个仓库：  源仓（私有）— Hexo 项目本体，包含 source&amp;#x2F;_posts&amp;#x2F;、主题配置、deploy 脚本等 Pages 仓（公开）— shixuan&amp;#x2F;shixuan.github.io，存放 hexo generate 产出的静态文件，GitHub Pages 直接服务  源仓大体应该要私有(?) - 主要考虑的点是config文件能不能暴露出来：虽然扫了一遍里面没有"><meta property="og:locale" content="en_US"><meta property="og:image" content="http://shixuan.github.io/img/og_image.png"><meta property="article:published_time" content="2025-07-08T00:00:00.000Z"><meta property="article:author" content="shixuan"><meta property="twitter:card" content="summary"><meta property="twitter:image:src" content="http://shixuan.github.io/img/og_image.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://shixuan.github.io/adr/0001-github-actions-deploy.html"},"headline":"ADR 0001 — GitHub Actions 自动部署","image":["http://shixuan.github.io/img/og_image.png"],"datePublished":"2025-07-08T00:00:00.000Z","author":{"@type":"Person","name":"shixuan"},"publisher":{"@type":"Organization","name":"Logs","logo":{"@type":"ImageObject","url":"http://shixuan.github.io/img/logo.gif"}},"description":"Context博客有两个仓库：  源仓（私有）— Hexo 项目本体，包含 source&#x2F;_posts&#x2F;、主题配置、deploy 脚本等 Pages 仓（公开）— shixuan&#x2F;shixuan.github.io，存放 hexo generate 产出的静态文件，GitHub Pages 直接服务  源仓大体应该要私有(?) - 主要考虑的点是config文件能不能暴露出来：虽然扫了一遍里面没有"}</script><link rel="canonical" href="http://shixuan.github.io/adr/0001-github-actions-deploy.html"><link rel="icon" href="/img/favicon.ico"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0/css/all.css"><link data-pjax rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link data-pjax rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" defer></script><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/css/justifiedGallery.min.css"><script src="https://www.googletagmanager.com/gtag/js?id=UA-175447554-1" async></script><script>window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+    
+        gtag('config', 'UA-175447554-1');</script><!--!--><!--!--><style>.pace{-webkit-pointer-events:none;pointer-events:none;-webkit-user-select:none;-moz-user-select:none;user-select:none}.pace-inactive{display:none}.pace .pace-progress{background:#3273dc;position:fixed;z-index:2000;top:0;right:100%;width:100%;height:2px}</style><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><!-- hexo injector head_end start --><script>
+  (function () {
+      function switchTab() {
+          if (!location.hash) {
+            return;
+          }
+
+          const id = '#' + CSS.escape(location.hash.substring(1));
+          const $tabMenu = document.querySelector(`.tabs a[href="${id}"]`);
+          if (!$tabMenu) {
+            return;
+          }
+
+          const $tabMenuContainer = $tabMenu.parentElement.parentElement;
+          Array.from($tabMenuContainer.children).forEach($menu => $menu.classList.remove('is-active'));
+          Array.from($tabMenuContainer.querySelectorAll('a'))
+              .map($menu => document.getElementById($menu.getAttribute("href").substring(1)))
+              .forEach($content => $content.classList.add('is-hidden'));
+
+          if ($tabMenu) {
+              $tabMenu.parentElement.classList.add('is-active');
+          }
+          const $activeTab = document.querySelector(id);
+          if ($activeTab) {
+              $activeTab.classList.remove('is-hidden');
+          }
+      }
+      switchTab();
+      window.addEventListener('hashchange', switchTab, false);
+  })();
+  </script><link rel="stylesheet" href="/css/custom.css?v=bae54b64"><link rel="stylesheet" href="https://unpkg.com/arcade-shelf@0.2.0/dist/style.css"><link rel="stylesheet" href="/css/arcade-shelf-override.css?v=722793b0"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Logs" type="application/atom+xml">
+</head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.gif" alt="Logs" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">Home</a><a class="navbar-item" href="/archives">Archives</a><a class="navbar-item" href="/gallery">Gallery</a><a class="navbar-item" href="/about">About</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/shixuan/shixuan.github.io"><i class="fab fa-github"></i></a><a class="navbar-item is-hidden-tablet catalogue" title="Catalogue" href="javascript:;"><i class="fas fa-list-ul"></i></a><a class="navbar-item search" title="Search" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-8-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item">Posted&nbsp;<time dateTime="2025-07-08T00:00:00.000Z" title="7/8/2025, 12:00:00 AM">2025-07-08</time></span><span class="level-item">7 minutes read (About 1035 words)</span><span class="level-item" id="busuanzi_container_page_pv"><span id="busuanzi_value_page_pv">0</span>&nbsp;visits</span></div></div><h1 class="title is-3 is-size-4-mobile">ADR 0001 — GitHub Actions 自动部署</h1><div class="content"><h1 id="Context"><a href="#Context" class="headerlink" title="Context"></a>Context</h1><p>博客有两个仓库：</p>
+<ul>
+<li><strong>源仓</strong>（私有）— Hexo 项目本体，包含 <code>source/_posts/</code>、主题配置、deploy 脚本等</li>
+<li><strong>Pages 仓</strong>（公开）— <code>shixuan/shixuan.github.io</code>，存放 <code>hexo generate</code> 产出的静态文件，GitHub Pages 直接服务</li>
+</ul>
+<p>源仓大体应该要私有(?) - 主要考虑的点是config文件能不能暴露出来：虽然扫了一遍里面没有什么值得隐藏的，但是考虑到之前commit历史中包含了OAuth app的secret(懒得清了)以及以后可能涉及到的扩展，最终还是决定私有。 但Pages 仓必须公开 — GitHub Pages 免费版只服务 public repo。</p>
+<p>之前每次发文都得本地 <code>hexo clean &amp;&amp; hexo generate &amp;&amp; hexo deploy</code>，三个命令稳定但烦。想要的是：push 到源仓 main → 自动构建 → 自动推到 Pages 仓，写完文章就能去刷视频了。</p>
+<h1 id="Decision"><a href="#Decision" class="headerlink" title="Decision"></a>Decision</h1><p>GitHub Actions 跑构建 + 部署，用 SSH deploy key 把构建产物推到 Pages 仓：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">push main (源仓)</span><br><span class="line">   │</span><br><span class="line">   ▼</span><br><span class="line">GitHub Actions</span><br><span class="line">   ├─ checkout 源仓</span><br><span class="line">   ├─ setup Node 20</span><br><span class="line">   ├─ npm install         (含 hexo-theme-icarus 6.1.1)</span><br><span class="line">   ├─ 复制 img/ → source/img/</span><br><span class="line">   ├─ hexo generate       (输出 public/)</span><br><span class="line">   └─ hexo deploy         (走 hexo-deployer-git，SSH push 到 Pages 仓)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>触发只有一种 — <code>push: branches: [main]</code>。手动触发都不需要，写完文章 push 一下就行。</p>
+<h1 id="Notes"><a href="#Notes" class="headerlink" title="Notes"></a>Notes</h1><h2 id="私有源-公开-Pages：两个-repo-之间走-SSH-deploy-key"><a href="#私有源-公开-Pages：两个-repo-之间走-SSH-deploy-key" class="headerlink" title="私有源 + 公开 Pages：两个 repo 之间走 SSH deploy key"></a>私有源 + 公开 Pages：两个 repo 之间走 SSH deploy key</h2><p>跨 repo 推送要鉴权。两条路：</p>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Personal Access Token (PAT)</td>
+<td>配置简单</td>
+<td>权限粒度粗，过期要重发</td>
+</tr>
+<tr>
+<td>SSH deploy key</td>
+<td>per-repo，scope 最小</td>
+<td>要生成密钥对、分别配置</td>
+</tr>
+</tbody></table>
+<p>走的是 SSH deploy key — 给 Pages 仓配一对密钥，公钥加到 Pages 仓的 Deploy Keys（Write access），私钥存到源仓的 Actions secrets 里 (<code>HEXO_DEPLOY_PRI</code>)：</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> -p ~/.ssh</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"<span class="variable">$HEXO_DEPLOY_PRI</span>"</span> &gt; ~/.ssh/id_rsa</span><br><span class="line"><span class="built_in">chmod</span> 600 ~/.ssh/id_rsa</span><br><span class="line">ssh-keyscan github.com &gt;&gt; ~/.ssh/known_hosts</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>ssh-keyscan github.com &gt;&gt; known_hosts</code> 是关键，否则 git push 会卡在 “Are you sure you want to continue connecting”。</p>
+<p><code>_config.yml</code> 的 deploy 段配 SSH URL 而不是 HTTPS：</p>
+<figure class="highlight yaml"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">deploy:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">git</span></span><br><span class="line">  <span class="attr">repo:</span> <span class="string">git@github.com:shixuan/shixuan.github.io.git</span></span><br><span class="line">  <span class="attr">branch:</span> <span class="string">master</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="Theme-走-npm-dep，不再-checkout-submodule"><a href="#Theme-走-npm-dep，不再-checkout-submodule" class="headerlink" title="Theme 走 npm dep，不再 checkout submodule"></a>Theme 走 npm dep，不再 checkout submodule</h2><p>deploy.yml 里那段注释掉的 “Checkout Icarus theme” 是历史遗迹 — 当年主题作为 git submodule 引入，CI 必须单独 checkout 才能拿到。现在 <code>hexo-theme-icarus: 6.1.1</code> 是 npm 依赖，<code>npm install</code> 自动拉取，CI 步骤少一截。</p>
+<p>代价是没法直接改主题文件 — 但这个约束反而好，自定义需求都通过 <a href="/adr/0003-custom-widget-injection.html">ADR 0003</a> 的 monkey-patch 走，主题升级路径完整保留。</p>
+<h2 id="图片放仓库根目录，build-时复制到-source-img"><a href="#图片放仓库根目录，build-时复制到-source-img" class="headerlink" title="图片放仓库根目录，build 时复制到 source/img/"></a>图片放仓库根目录，build 时复制到 <code>source/img/</code></h2><figure class="highlight yaml"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Generate</span> <span class="string">static</span> <span class="string">site</span></span><br><span class="line">  <span class="attr">run:</span> <span class="string">|</span></span><br><span class="line"><span class="string">    mkdir -p source/img &amp;&amp; cp -r img/* source/img/</span></span><br><span class="line"><span class="string">    npx hexo generate</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>仓库根有一个 <code>img/</code> 目录，本地仓库里 <code>source/img/</code> 不存在 — 是 CI 临时拼出来的。Hexo 把 <code>source/</code> 整个当输入，<code>source/img/</code> 会被原样复制到 <code>public/img/</code> 服务出去。</p>
+<p>把 img 留在根目录的好处：clone 仓库一眼能看到资源；坏处是新人不知道为什么要这个 copy 步骤。属于个人习惯，不强推。</p>
+<h2 id="FORCE-JAVASCRIPT-ACTIONS-TO-NODE24：第三方-action-的运行时兼容开关"><a href="#FORCE-JAVASCRIPT-ACTIONS-TO-NODE24：第三方-action-的运行时兼容开关" class="headerlink" title="FORCE_JAVASCRIPT_ACTIONS_TO_NODE24：第三方 action 的运行时兼容开关"></a><code>FORCE_JAVASCRIPT_ACTIONS_TO_NODE24</code>：第三方 action 的运行时兼容开关</h2><p>GitHub Actions 平台正在从 Node 20 runtime 过渡到 Node 24，过渡期里部分 action 已经要求 Node 24，但 runner 默认还在 Node 20。设置这个 env var 强制所有 JS-based action 跑在 Node 24 上：</p>
+<figure class="highlight yaml"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">env:</span></span><br><span class="line">  <span class="attr">FORCE_JAVASCRIPT_ACTIONS_TO_NODE24:</span> <span class="literal">true</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>提前 opt-in 比等 GitHub 改默认值再被动应付舒服 — 出问题现在能从容修，不会哪天突然 build 全红。</p>
+<h2 id="hexo-deployer-git-的工作机制"><a href="#hexo-deployer-git-的工作机制" class="headerlink" title="hexo-deployer-git 的工作机制"></a><code>hexo-deployer-git</code> 的工作机制</h2><p><code>npx hexo deploy</code> 调用 <code>hexo-deployer-git</code> 插件，干这几件事：</p>
+<ol>
+<li>拿 <code>_config.yml</code> 的 deploy.repo / branch</li>
+<li>在 <code>.deploy_git/</code> 里 clone（或复用）目标分支</li>
+<li>把当前 <code>public/</code> 内容覆盖进 <code>.deploy_git/</code></li>
+<li><code>git add . &amp;&amp; git commit -m "Site updated: ..."</code> → SSH push</li>
+</ol>
+<p>每次部署是<strong>单个 commit 覆盖式推送</strong>，Pages 仓的历史只有一行行 “Site updated”，Pages 仓本质是构建产物的镜像，不需要源码commit记录。</p>
+</div><div class="article-licensing box"><div class="licensing-title"><p>ADR 0001 — GitHub Actions 自动部署</p><p><a href="http://shixuan.github.io/adr/0001-github-actions-deploy.html">http://shixuan.github.io/adr/0001-github-actions-deploy.html</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>Author</h6><p>shixuan</p></div></div><div class="level-item is-narrow"><div><h6>Posted on</h6><p>2025-07-08</p></div></div><div class="level-item is-narrow"><div><h6>Licensed under</h6><p><a class="icons" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="icon fab fa-creative-commons"></i></a><a class="icons" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="icon fab fa-creative-commons-by"></i></a><a class="icons" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="icon fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><div class="addthis_inline_share_toolbox"></div><script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5f36627a4fb687b2" defer></script></article></div><div class="card"><div class="card-content"><h3 class="menu-label has-text-centered">Like this article? Support the author with</h3><div class="buttons is-centered"><a class="button donate" href="https://www.buymeacoffee.com/shixuan" target="_blank" rel="noopener" data-type="buymeacoffee"><span class="icon is-small"><i class="fas fa-coffee"></i></span><span>Buy me a coffee</span></a></div></div></div><div class="card" id="comments"><div class="card-content"><h3 class="title is-5">Comments</h3><script src="https://giscus.app/client.js" repo="shixuan/shixuan.github.io" data-repo="shixuan/shixuan.github.io" data-repo-id="MDEwOlJlcG9zaXRvcnkyMjY5MDc3OTE=" data-category-id="DIC_kwDODYZWj84CswDG" data-category="Announcements" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="top" data-theme="light" data-lang="en" data-loading="lazy" crossorigin="anonymous" async></script></div></div></div><div class="column column-left is-4-tablet is-4-desktop is-4-widescreen  order-1 is-sticky"><div class="card widget" id="toc" data-type="toc"><div class="card-content"><div class="menu"><h3 class="menu-label">Catalogue</h3><ul class="menu-list"><li><a class="level is-mobile" href="#Context"><span class="level-left"><span class="level-item">1</span><span class="level-item">Context</span></span></a></li><li><a class="level is-mobile" href="#Decision"><span class="level-left"><span class="level-item">2</span><span class="level-item">Decision</span></span></a></li><li><a class="level is-mobile" href="#Notes"><span class="level-left"><span class="level-item">3</span><span class="level-item">Notes</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#私有源-公开-Pages：两个-repo-之间走-SSH-deploy-key"><span class="level-left"><span class="level-item">3.1</span><span class="level-item">私有源 + 公开 Pages：两个 repo 之间走 SSH deploy key</span></span></a></li><li><a class="level is-mobile" href="#Theme-走-npm-dep，不再-checkout-submodule"><span class="level-left"><span class="level-item">3.2</span><span class="level-item">Theme 走 npm dep，不再 checkout submodule</span></span></a></li><li><a class="level is-mobile" href="#图片放仓库根目录，build-时复制到-source-img"><span class="level-left"><span class="level-item">3.3</span><span class="level-item">图片放仓库根目录，build 时复制到 source/img/</span></span></a></li><li><a class="level is-mobile" href="#FORCE-JAVASCRIPT-ACTIONS-TO-NODE24：第三方-action-的运行时兼容开关"><span class="level-left"><span class="level-item">3.4</span><span class="level-item">FORCE_JAVASCRIPT_ACTIONS_TO_NODE24：第三方 action 的运行时兼容开关</span></span></a></li><li><a class="level is-mobile" href="#hexo-deployer-git-的工作机制"><span class="level-left"><span class="level-item">3.5</span><span class="level-item">hexo-deployer-git 的工作机制</span></span></a></li></ul></li></ul></div></div><style>#toc .menu-list > li > a.is-active + .menu-list { display: block; }#toc .menu-list > li > a + .menu-list { display: none; }</style><script src="/js/toc.js" defer></script></div></div><!--!--></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/img/logo.gif" alt="Logs" height="28"></a><p class="is-size-7"><span>&copy; 2026 shixuan</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a><br><span id="busuanzi_container_site_uv">Visited by <span id="busuanzi_value_site_uv">0</span> users</span></p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/shixuan"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("en");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script data-pjax src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="Back to top" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script data-pjax src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "This website uses cookies to improve your experience.",
+          dismiss: "Got it!",
+          allow: "Allow cookies",
+          deny: "Decline",
+          link: "Learn more",
+          policy: "Cookie Policy",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><script type="text/javascript" id="MathJax-script" async>MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      },
+      svg: {
+        fontCache: 'global'
+      },
+      chtml: {
+        matchFontHeight: false
+      }
+    };</script><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><!--!--><script data-pjax src="/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="Type something..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script data-pjax src="/js/insight.js" defer></script><script data-pjax>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"Type something...","untitled":"(Untitled)","posts":"Posts","pages":"Pages","categories":"Categories","tags":"Tags"});
+        });</script><!-- hexo injector body_end start --><script src="https://unpkg.com/arcade-shelf@0.2.0/dist/index.umd.cjs" defer></script><script src="/js/arcade-shelf-init.js?v=531064cb" defer></script><!-- hexo injector body_end end --></body></html>

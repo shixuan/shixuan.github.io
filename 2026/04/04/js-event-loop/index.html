@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>JS事件循环 - Logs</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="Logs"><meta name="msapplication-TileImage" content="/img/favicon.ico"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Logs"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="Javascript event loop"><meta property="og:type" content="blog"><meta property="og:title" content="JS事件循环"><meta property="og:url" content="http://shixuan.github.io/2026/04/04/js-event-loop/"><meta property="og:site_name" content="Logs"><meta property="og:description" content="Javascript event loop"><meta property="og:locale" content="en_US"><meta property="og:image" content="http://shixuan.github.io/img/og_image.png"><meta property="article:published_time" content="2026-04-04T00:00:00.000Z"><meta property="article:author" content="shixuan"><meta property="article:tag" content="Javascript"><meta property="twitter:card" content="summary"><meta property="twitter:image:src" content="http://shixuan.github.io/img/og_image.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://shixuan.github.io/2026/04/04/js-event-loop/"},"headline":"JS事件循环","image":["http://shixuan.github.io/img/og_image.png"],"datePublished":"2026-04-04T00:00:00.000Z","author":{"@type":"Person","name":"shixuan"},"publisher":{"@type":"Organization","name":"Logs","logo":{"@type":"ImageObject","url":"http://shixuan.github.io/img/logo.gif"}},"description":"Javascript event loop"}</script><link rel="canonical" href="http://shixuan.github.io/2026/04/04/js-event-loop/"><link rel="icon" href="/img/favicon.ico"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0/css/all.css"><link data-pjax rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link data-pjax rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" defer></script><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/css/justifiedGallery.min.css"><script src="https://www.googletagmanager.com/gtag/js?id=UA-175447554-1" async></script><script>window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+    
+        gtag('config', 'UA-175447554-1');</script><!--!--><!--!--><style>.pace{-webkit-pointer-events:none;pointer-events:none;-webkit-user-select:none;-moz-user-select:none;user-select:none}.pace-inactive{display:none}.pace .pace-progress{background:#3273dc;position:fixed;z-index:2000;top:0;right:100%;width:100%;height:2px}</style><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><!-- hexo injector head_end start --><script>
+  (function () {
+      function switchTab() {
+          if (!location.hash) {
+            return;
+          }
+
+          const id = '#' + CSS.escape(location.hash.substring(1));
+          const $tabMenu = document.querySelector(`.tabs a[href="${id}"]`);
+          if (!$tabMenu) {
+            return;
+          }
+
+          const $tabMenuContainer = $tabMenu.parentElement.parentElement;
+          Array.from($tabMenuContainer.children).forEach($menu => $menu.classList.remove('is-active'));
+          Array.from($tabMenuContainer.querySelectorAll('a'))
+              .map($menu => document.getElementById($menu.getAttribute("href").substring(1)))
+              .forEach($content => $content.classList.add('is-hidden'));
+
+          if ($tabMenu) {
+              $tabMenu.parentElement.classList.add('is-active');
+          }
+          const $activeTab = document.querySelector(id);
+          if ($activeTab) {
+              $activeTab.classList.remove('is-hidden');
+          }
+      }
+      switchTab();
+      window.addEventListener('hashchange', switchTab, false);
+  })();
+  </script><link rel="stylesheet" href="/css/custom.css?v=bae54b64"><link rel="stylesheet" href="https://unpkg.com/arcade-shelf@0.2.0/dist/style.css"><link rel="stylesheet" href="/css/arcade-shelf-override.css?v=722793b0"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Logs" type="application/atom+xml">
+</head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.gif" alt="Logs" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">Home</a><a class="navbar-item" href="/archives">Archives</a><a class="navbar-item" href="/gallery">Gallery</a><a class="navbar-item" href="/about">About</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/shixuan/shixuan.github.io"><i class="fab fa-github"></i></a><a class="navbar-item is-hidden-tablet catalogue" title="Catalogue" href="javascript:;"><i class="fas fa-list-ul"></i></a><a class="navbar-item search" title="Search" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-8-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item">Posted&nbsp;<time dateTime="2026-04-04T00:00:00.000Z" title="4/4/2026, 12:00:00 AM">2026-04-04</time></span><span class="level-item"><a class="link-muted" href="/categories/coding/">coding</a></span><span class="level-item">15 minutes read (About 2255 words)</span><span class="level-item" id="busuanzi_container_page_pv"><span id="busuanzi_value_page_pv">0</span>&nbsp;visits</span></div></div><h1 class="title is-3 is-size-4-mobile">JS事件循环</h1><div class="content"><p>Javascript event loop<span id="more"></span></p>
+<h1 id="从一个-Bug-说起"><a href="#从一个-Bug-说起" class="headerlink" title="从一个 Bug 说起"></a>从一个 Bug 说起</h1><p>我在做一个图片相册页面，用 lightGallery 插件展示图片，图片有中英文描述（caption），通过 API 懒加载。逻辑很简单：用户点开大图时，发请求拿描述，拿到后把描述写进 lightGallery 的 <code>.lg-sub-html</code> 容器里。</p>
+<p>lightGallery 有一个 <code>onAfterOpen</code> 事件，在灯箱打开后触发，我就在这里注入描述：</p>
+<figure class="highlight javascript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$(el).<span class="title function_">on</span>(<span class="string">"onAfterOpen.lg"</span>, <span class="keyword">function</span>(<span class="params"></span>) {</span><br><span class="line">  <span class="keyword">const</span> key  = <span class="title function_">getCurrentKey</span>();</span><br><span class="line">  <span class="keyword">const</span> meta = <span class="keyword">await</span> <span class="title function_">fetchMeta</span>(key); <span class="comment">// 请求描述</span></span><br><span class="line">  <span class="variable language_">document</span>.<span class="title function_">querySelector</span>(<span class="string">".lg-sub-html"</span>).<span class="property">innerHTML</span> = meta.<span class="property">caption</span>;</span><br><span class="line">});</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>第一次</strong>打开图片：描述正常显示。</p>
+<p><strong>关掉再打开</strong>：描述消失了，显示的是图片的 <code>alt</code> 属性（文件名 <code>uuid.jpg</code>。</p>
+<p>但用左右箭头切换图片，描述又能正常显示。</p>
+<p>奇怪的地方在于，index 是对的，key 是对的，API 也有缓存，逻辑上没有任何区别。</p>
+<p>无奈之下，把bug扔给了Claude Code，它在一通Thinking Musing Noodling之后，加了一行 <code>setTimeout(fn, 0)</code> ，问题消失了：</p>
+<figure class="highlight javascript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$(el).<span class="title function_">on</span>(<span class="string">"onAfterOpen.lg"</span>, <span class="keyword">function</span>(<span class="params"></span>) {</span><br><span class="line">  <span class="built_in">setTimeout</span>(<span class="title function_">async</span> () =&gt; {</span><br><span class="line">    <span class="keyword">const</span> key  = <span class="title function_">getCurrentKey</span>();</span><br><span class="line">    <span class="keyword">const</span> meta = <span class="keyword">await</span> <span class="title function_">fetchMeta</span>(key);</span><br><span class="line">    <span class="variable language_">document</span>.<span class="title function_">querySelector</span>(<span class="string">".lg-sub-html"</span>).<span class="property">innerHTML</span> = meta.<span class="property">caption</span>;</span><br><span class="line">  }, <span class="number">0</span>);</span><br><span class="line">});</span><br></pre></td></tr></tbody></table></figure>
+
+<p>为什么？<code>0</code> 毫秒不就是立刻执行吗？这跟不加有什么区别？</p>
+<h1 id="JS-是单线程的"><a href="#JS-是单线程的" class="headerlink" title="JS 是单线程的"></a>JS 是单线程的</h1><p>JavaScript 是单线程语言，意味着它同一时刻只能做一件事。所有代码都在一个线程里排队执行，不存在两段代码真正并行运行的情况。</p>
+<p>这有历史原因。JS 最初是为浏览器设计的，用来操作 DOM。如果多个线程同时修改同一个 DOM 节点，会产生无法预测的冲突。单线程彻底避免了这个问题。</p>
+<p>但单线程带来了一个显而易见的问题：如果某个操作很慢（比如从服务器请求数据），整个线程就会卡在那里，用户界面完全冻结，没法点击任何东西。</p>
+<p>JS 的解决方案是<strong>异步 + 事件循环</strong>。</p>
+<h1 id="调用栈"><a href="#调用栈" class="headerlink" title="调用栈"></a>调用栈</h1><p><strong>调用栈</strong>(Call Stack)是 JS 引擎追踪”当前在执行哪个函数”的数据结构。每调用一个函数，就把它压入栈顶；函数执行完，就从栈顶弹出。这个概念比较好理解，这是大多数设计都会使用的数据结构。</p>
+<figure class="highlight javascript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">greet</span>(<span class="params">name</span>) {</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"Hello, "</span> + name);</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">main</span>(<span class="params"></span>) {</span><br><span class="line">  <span class="title function_">greet</span>(<span class="string">"Alice"</span>);</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"Done"</span>);</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="title function_">main</span>();</span><br></pre></td></tr></tbody></table></figure>
+
+<p>执行过程：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">压入 main()</span><br><span class="line">  压入 greet("Alice")</span><br><span class="line">    压入 console.log(...)  →  打印 "Hello, Alice"</span><br><span class="line">    弹出 console.log</span><br><span class="line">  弹出 greet</span><br><span class="line">  压入 console.log(...)  →  打印 "Done"</span><br><span class="line">  弹出 console.log</span><br><span class="line">弹出 main()</span><br><span class="line">调用栈清空</span><br></pre></td></tr></tbody></table></figure>
+
+<p>调用栈清空，代表当前这一轮同步代码执行完毕。</p>
+<h1 id="任务队列"><a href="#任务队列" class="headerlink" title="任务队列"></a>任务队列</h1><p>网络请求、定时器、用户点击这些操作，结果出来的时机是不确定的。JS 不可能在等它们的时候什么都不做，所以引入了<strong>任务队列</strong>（Task Queue）。</p>
+<p>机制是这样的：</p>
+<ol>
+<li>异步操作（如 <code>setTimeout</code>）被注册后，JS 引擎不等待，继续往下执行</li>
+<li>当异步操作完成（定时器结束、请求返回、用户点击），对应的回调函数被放进任务队列</li>
+<li>当<strong>调用栈完全清空</strong>后，事件循环从任务队列里取出第一个任务，压入调用栈执行</li>
+<li>执行完再次清空，再取下一个，如此循环</li>
+</ol>
+<p>这个”不断检查调用栈是否为空，为空就从队列取任务执行”的机制，就叫<strong>事件循环</strong>（Event Loop）。</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">        ┌─────────────┐</span><br><span class="line">        │   调用栈     │  ← JS 引擎在这里执行代码</span><br><span class="line">        └──────┬──────┘</span><br><span class="line">               │ 清空时</span><br><span class="line">               ▼</span><br><span class="line">        ┌─────────────┐</span><br><span class="line">──────&gt; │  任务队列    │  ← 异步回调在这里等待</span><br><span class="line">        └─────────────┘</span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="回到-Bug：setTimeout-0-做了什么"><a href="#回到-Bug：setTimeout-0-做了什么" class="headerlink" title="回到 Bug：setTimeout(0) 做了什么"></a>回到 Bug：<code>setTimeout(0)</code> 做了什么</h1><p>现在可以解释那个 bug 了。</p>
+<h2 id="没有-setTimeout-0-时"><a href="#没有-setTimeout-0-时" class="headerlink" title="没有 setTimeout(0) 时"></a>没有 <code>setTimeout(0)</code> 时</h2><p>lightGallery 触发 <code>onAfterOpen</code> 事件时，它自己还没执行完——写入 <code>uuid.jpg</code> 到 sub-html 的代码还在调用栈里排着。</p>
+<p>我们的 handler 在这时执行，如果缓存命中，<code>fetchMeta</code>这个获取caption信息的函数几乎立即返回，然后caption被写进 sub-html。接着 lightGallery 继续执行，把 <code>uuid.jpg</code> 写进去，<strong>覆盖了我们的 caption</strong>。</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[调用栈]</span><br><span class="line">  LG 的 onAfterOpen 处理逻辑</span><br><span class="line">    → 触发 onAfterOpen 事件</span><br><span class="line">    → 我们的 handler 运行</span><br><span class="line">      → fetchMeta（缓存命中，立即返回）</span><br><span class="line">      → 写入 caption ✓（但还没完...）</span><br><span class="line">    → LG 继续执行，写入 uuid.jpg，覆盖 caption ✗</span><br></pre></td></tr></tbody></table></figure>
+
+<p>第一次打开时没有这个问题，是因为 <code>fetchMeta</code> 要发网络请求，耗时几百毫秒。等请求回来时，LG 早已经把 uuid.jpg 写完了，我们再覆盖，顺序是对的。</p>
+<p>这是一个典型的<strong>竞态条件</strong>（Race Condition）：同一段代码，因为快慢不同，执行顺序不同，结果也不同。</p>
+<h2 id="加了-setTimeout-0-后"><a href="#加了-setTimeout-0-后" class="headerlink" title="加了 setTimeout(0) 后"></a>加了 <code>setTimeout(0)</code> 后</h2><p><code>setTimeout(fn, 0)</code> 不是”立刻执行 fn”，而是”把 fn 放进任务队列，等当前调用栈清空后再执行”。</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[调用栈]</span><br><span class="line">  LG 的 onAfterOpen 处理逻辑</span><br><span class="line">    → 触发 onAfterOpen 事件</span><br><span class="line">    → 我们的 handler 运行</span><br><span class="line">      → setTimeout(fn, 0)：fn 被放入任务队列，handler 返回</span><br><span class="line">    → LG 继续执行，写入 uuid.jpg</span><br><span class="line">  LG 全部执行完毕，调用栈清空</span><br><span class="line"></span><br><span class="line">[任务队列]</span><br><span class="line">  → fn 被取出执行</span><br><span class="line">  → fetchMeta（缓存命中）</span><br><span class="line">  → 写入 caption，覆盖 uuid.jpg ✓</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>0</code> 毫秒的意义不是”等待时长为零”，而是”尽快，但必须在当前同步代码执行完之后”。这一个字之差，决定了在队列里的位置。</p>
+<h1 id="宏任务与微任务"><a href="#宏任务与微任务" class="headerlink" title="宏任务与微任务"></a>宏任务与微任务</h1><p>实际上任务队列不只一个。JS 中的异步任务分为两类：</p>
+<p><strong>宏任务（Macrotask）</strong>，也叫任务（Task）：</p>
+<ul>
+<li><code>setTimeout</code> / <code>setInterval</code></li>
+<li>I/O（网络请求完成、文件读取）</li>
+<li>用户事件（点击、键盘输入）</li>
+<li><code>postMessage</code></li>
+</ul>
+<p><strong>微任务（Microtask）</strong>：</p>
+<ul>
+<li><code>Promise.then</code> / <code>Promise.catch</code> / <code>Promise.finally</code></li>
+<li><code>queueMicrotask</code></li>
+<li><code>MutationObserver</code></li>
+</ul>
+<p>执行顺序的规则是：</p>
+<blockquote>
+<p><strong>每次调用栈清空后，先把所有微任务队列清空，再取一个宏任务执行。</strong></p>
+</blockquote>
+<p>一个例子：</p>
+<figure class="highlight javascript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"1"</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"2"</span>), <span class="number">0</span>);  <span class="comment">// 宏任务</span></span><br><span class="line"></span><br><span class="line"><span class="title class_">Promise</span>.<span class="title function_">resolve</span>().<span class="title function_">then</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"3"</span>));  <span class="comment">// 微任务</span></span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"4"</span>);</span><br></pre></td></tr></tbody></table></figure>
+
+<p>输出顺序：<code>1</code> → <code>4</code> → <code>3</code> → <code>2</code></p>
+<p>执行过程：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">同步代码：打印 1</span><br><span class="line">注册 setTimeout 回调（放入宏任务队列）</span><br><span class="line">注册 Promise.then 回调（放入微任务队列）</span><br><span class="line">同步代码：打印 4</span><br><span class="line">调用栈清空</span><br><span class="line"></span><br><span class="line">→ 清空微任务队列：打印 3</span><br><span class="line">→ 取一个宏任务：打印 2</span><br></pre></td></tr></tbody></table></figure>
+
+<p>微任务比宏任务优先级更高，会在下一个宏任务执行前全部清空。</p>
+<p>一个更复杂的例子:</p>
+<figure class="highlight javascript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"start"</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> {</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"timeout"</span>);</span><br><span class="line">  <span class="title class_">Promise</span>.<span class="title function_">resolve</span>().<span class="title function_">then</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"timeout 里的 promise"</span>));</span><br><span class="line">}, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="title class_">Promise</span>.<span class="title function_">resolve</span>()</span><br><span class="line">  .<span class="title function_">then</span>(<span class="function">() =&gt;</span> {</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"promise 1"</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="title class_">Promise</span>.<span class="title function_">resolve</span>();</span><br><span class="line">  })</span><br><span class="line">  .<span class="title function_">then</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"promise 2"</span>));</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"end"</span>);</span><br></pre></td></tr></tbody></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">start</span><br><span class="line">end</span><br><span class="line">promise 1</span><br><span class="line">promise 2</span><br><span class="line">timeout</span><br><span class="line">timeout 里的 promise</span><br></pre></td></tr></tbody></table></figure>
+
+<p>关键点：<code>promise 1</code> 的 <code>.then</code> 里又产生了一个微任务（<code>promise 2</code>），它会在当前微任务队列清空前插队，优先于 <code>timeout</code> 执行。</p>
+<h1 id="async-await-是什么"><a href="#async-await-是什么" class="headerlink" title="async/await 是什么"></a>async/await 是什么</h1><p><code>async/await</code> 是 Promise 的语法糖，本质上还是微任务。</p>
+<figure class="highlight javascript"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">foo</span>(<span class="params"></span>) {</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"A"</span>);</span><br><span class="line">  <span class="keyword">await</span> <span class="title function_">bar</span>();</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"B"</span>);</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">bar</span>(<span class="params"></span>) {</span><br><span class="line">  <span class="keyword">return</span> <span class="number">42</span>;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="title function_">foo</span>();</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">"C"</span>);</span><br></pre></td></tr></tbody></table></figure>
+
+<p>输出：<code>A</code> → <code>C</code> → <code>B</code></p>
+<p><code>await</code> 之后的代码被包装成一个微任务，等当前同步代码（打印 C）执行完后，才从微任务队列取出执行（打印 B）。</p>
+<h1 id="为什么要这样？就你JS事多是吧"><a href="#为什么要这样？就你JS事多是吧" class="headerlink" title="为什么要这样？就你JS事多是吧"></a>为什么要这样？就你JS事多是吧</h1><p><strong>单线程 + 事件循环</strong>是一个权衡。</p>
+<p>放弃多线程，避免了锁、竞态、死锁这一整套并发问题，代价是所有耗时操作必须异步化。事件循环让 JS 在等待异步结果的同时，仍然能响应用户操作，界面不会冻结。</p>
+<p>宏任务和微任务的优先级划分也有实际用途：微任务（Promise）用于需要在当前操作”结算”之前完成的事，比如状态更新、数据转换；宏任务（setTimeout）用于真正的延后，让出线程给渲染引擎刷新界面。</p>
+<p>浏览器的渲染（repaint）发生在每个宏任务之间，微任务不会触发渲染。所以如果你在微任务里不停地生产新微任务，渲染会被一直阻塞——这是一个实际的性能陷阱。</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><blockquote>
+<p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Execution_model">JavaScript execution model from MDN</a></p>
+</blockquote>
+</div><div class="article-licensing box"><div class="licensing-title"><p>JS事件循环</p><p><a href="http://shixuan.github.io/2026/04/04/js-event-loop/">http://shixuan.github.io/2026/04/04/js-event-loop/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>Author</h6><p>shixuan</p></div></div><div class="level-item is-narrow"><div><h6>Posted on</h6><p>2026-04-04</p></div></div><div class="level-item is-narrow"><div><h6>Licensed under</h6><p><a class="icons" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="icon fab fa-creative-commons"></i></a><a class="icons" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="icon fab fa-creative-commons-by"></i></a><a class="icons" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="icon fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><div class="article-tags is-size-7 mb-4"><span class="mr-2">#</span><a class="link-muted mr-2" rel="tag" href="/tags/Javascript/">Javascript</a></div><div class="addthis_inline_share_toolbox"></div><script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5f36627a4fb687b2" defer></script></article></div><div class="card"><div class="card-content"><h3 class="menu-label has-text-centered">Like this article? Support the author with</h3><div class="buttons is-centered"><a class="button donate" href="https://www.buymeacoffee.com/shixuan" target="_blank" rel="noopener" data-type="buymeacoffee"><span class="icon is-small"><i class="fas fa-coffee"></i></span><span>Buy me a coffee</span></a></div></div></div><nav class="post-navigation mt-4 level is-mobile"><div class="level-end"><a class="article-nav-next level level-item link-muted" href="/2026/03/28/cloudflare-r2-photo-gallery/"><span class="level-item">Cloudflare R2 个人相册方案</span><i class="level-item fas fa-chevron-right"></i></a></div></nav><div class="card" id="comments"><div class="card-content"><h3 class="title is-5">Comments</h3><script src="https://giscus.app/client.js" repo="shixuan/shixuan.github.io" data-repo="shixuan/shixuan.github.io" data-repo-id="MDEwOlJlcG9zaXRvcnkyMjY5MDc3OTE=" data-category-id="DIC_kwDODYZWj84CswDG" data-category="Announcements" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="top" data-theme="light" data-lang="en" data-loading="lazy" crossorigin="anonymous" async></script></div></div></div><div class="column column-left is-4-tablet is-4-desktop is-4-widescreen  order-1 is-sticky"><div class="card widget" id="toc" data-type="toc"><div class="card-content"><div class="menu"><h3 class="menu-label">Catalogue</h3><ul class="menu-list"><li><a class="level is-mobile" href="#从一个-Bug-说起"><span class="level-left"><span class="level-item">1</span><span class="level-item">从一个 Bug 说起</span></span></a></li><li><a class="level is-mobile" href="#JS-是单线程的"><span class="level-left"><span class="level-item">2</span><span class="level-item">JS 是单线程的</span></span></a></li><li><a class="level is-mobile" href="#调用栈"><span class="level-left"><span class="level-item">3</span><span class="level-item">调用栈</span></span></a></li><li><a class="level is-mobile" href="#任务队列"><span class="level-left"><span class="level-item">4</span><span class="level-item">任务队列</span></span></a></li><li><a class="level is-mobile" href="#回到-Bug：setTimeout-0-做了什么"><span class="level-left"><span class="level-item">5</span><span class="level-item">回到 Bug：setTimeout(0) 做了什么</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#没有-setTimeout-0-时"><span class="level-left"><span class="level-item">5.1</span><span class="level-item">没有 setTimeout(0) 时</span></span></a></li><li><a class="level is-mobile" href="#加了-setTimeout-0-后"><span class="level-left"><span class="level-item">5.2</span><span class="level-item">加了 setTimeout(0) 后</span></span></a></li></ul></li><li><a class="level is-mobile" href="#宏任务与微任务"><span class="level-left"><span class="level-item">6</span><span class="level-item">宏任务与微任务</span></span></a></li><li><a class="level is-mobile" href="#async-await-是什么"><span class="level-left"><span class="level-item">7</span><span class="level-item">async/await 是什么</span></span></a></li><li><a class="level is-mobile" href="#为什么要这样？就你JS事多是吧"><span class="level-left"><span class="level-item">8</span><span class="level-item">为什么要这样？就你JS事多是吧</span></span></a></li><li><a class="level is-mobile" href="#Reference"><span class="level-left"><span class="level-item">9</span><span class="level-item">Reference</span></span></a></li></ul></div></div><style>#toc .menu-list > li > a.is-active + .menu-list { display: block; }#toc .menu-list > li > a + .menu-list { display: none; }</style><script src="/js/toc.js" defer></script></div></div><!--!--></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/img/logo.gif" alt="Logs" height="28"></a><p class="is-size-7"><span>&copy; 2026 shixuan</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a><br><span id="busuanzi_container_site_uv">Visited by <span id="busuanzi_value_site_uv">0</span> users</span></p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/shixuan"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("en");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script data-pjax src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="Back to top" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script data-pjax src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "This website uses cookies to improve your experience.",
+          dismiss: "Got it!",
+          allow: "Allow cookies",
+          deny: "Decline",
+          link: "Learn more",
+          policy: "Cookie Policy",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><script type="text/javascript" id="MathJax-script" async>MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      },
+      svg: {
+        fontCache: 'global'
+      },
+      chtml: {
+        matchFontHeight: false
+      }
+    };</script><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><!--!--><script data-pjax src="/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="Type something..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script data-pjax src="/js/insight.js" defer></script><script data-pjax>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"Type something...","untitled":"(Untitled)","posts":"Posts","pages":"Pages","categories":"Categories","tags":"Tags"});
+        });</script><!-- hexo injector body_end start --><script src="https://unpkg.com/arcade-shelf@0.2.0/dist/index.umd.cjs" defer></script><script src="/js/arcade-shelf-init.js?v=531064cb" defer></script><!-- hexo injector body_end end --></body></html>

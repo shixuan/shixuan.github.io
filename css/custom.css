@@ -1,0 +1,36 @@
+/* ── ADR list (About page) ───────────────────────────────────── */
+.adr-list {
+  list-style: none;
+  margin: .5rem 0 0;
+  padding: 0;
+}
+.adr-list li {
+  padding: .35rem 0;
+  border-bottom: 1px dashed #eee;
+  font-size: .95rem;
+}
+.adr-list li:last-child {
+  border-bottom: none;
+}
+.adr-list .adr-date {
+  color: #999;
+  font-size: .85rem;
+  margin-left: .25rem;
+}
+
+/* ── Pinned announcement post ────────────────────────────────── */
+.card:has(.message) .article-meta {
+  display: none !important;
+}
+
+.card:has(.message) .article::before {
+  content: "\f08d\00a0\00a0Pinned";
+  font-family: "Font Awesome 5 Free", "Font Awesome 6 Free", sans-serif;
+  font-weight: 900;
+  font-size: .72rem;
+  color: #7a9fd4;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  display: block;
+  margin-bottom: .65rem;
+}
