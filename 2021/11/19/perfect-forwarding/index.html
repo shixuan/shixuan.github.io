@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>完美转发 - Logs</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="Logs"><meta name="msapplication-TileImage" content="/img/favicon.ico"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Logs"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="Reference collapse and perfect forwarding"><meta property="og:type" content="blog"><meta property="og:title" content="完美转发"><meta property="og:url" content="http://shixuan.github.io/2021/11/19/perfect-forwarding/"><meta property="og:site_name" content="Logs"><meta property="og:description" content="Reference collapse and perfect forwarding"><meta property="og:locale" content="en_US"><meta property="og:image" content="http://shixuan.github.io/img/og_image.png"><meta property="article:published_time" content="2021-11-19T21:45:55.000Z"><meta property="article:author" content="shixuan"><meta property="article:tag" content="cpp"><meta property="twitter:card" content="summary"><meta property="twitter:image:src" content="http://shixuan.github.io/img/og_image.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://shixuan.github.io/2021/11/19/perfect-forwarding/"},"headline":"完美转发","image":["http://shixuan.github.io/img/og_image.png"],"datePublished":"2021-11-19T21:45:55.000Z","author":{"@type":"Person","name":"shixuan"},"publisher":{"@type":"Organization","name":"Logs","logo":{"@type":"ImageObject","url":"http://shixuan.github.io/img/logo.gif"}},"description":"Reference collapse and perfect forwarding"}</script><link rel="canonical" href="http://shixuan.github.io/2021/11/19/perfect-forwarding/"><link rel="icon" href="/img/favicon.ico"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0/css/all.css"><link data-pjax rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link data-pjax rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" defer></script><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/css/justifiedGallery.min.css"><script src="https://www.googletagmanager.com/gtag/js?id=UA-175447554-1" async></script><script>window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+    
+        gtag('config', 'UA-175447554-1');</script><!--!--><!--!--><style>.pace{-webkit-pointer-events:none;pointer-events:none;-webkit-user-select:none;-moz-user-select:none;user-select:none}.pace-inactive{display:none}.pace .pace-progress{background:#3273dc;position:fixed;z-index:2000;top:0;right:100%;width:100%;height:2px}</style><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><!-- hexo injector head_end start --><script>
+  (function () {
+      function switchTab() {
+          if (!location.hash) {
+            return;
+          }
+
+          const id = '#' + CSS.escape(location.hash.substring(1));
+          const $tabMenu = document.querySelector(`.tabs a[href="${id}"]`);
+          if (!$tabMenu) {
+            return;
+          }
+
+          const $tabMenuContainer = $tabMenu.parentElement.parentElement;
+          Array.from($tabMenuContainer.children).forEach($menu => $menu.classList.remove('is-active'));
+          Array.from($tabMenuContainer.querySelectorAll('a'))
+              .map($menu => document.getElementById($menu.getAttribute("href").substring(1)))
+              .forEach($content => $content.classList.add('is-hidden'));
+
+          if ($tabMenu) {
+              $tabMenu.parentElement.classList.add('is-active');
+          }
+          const $activeTab = document.querySelector(id);
+          if ($activeTab) {
+              $activeTab.classList.remove('is-hidden');
+          }
+      }
+      switchTab();
+      window.addEventListener('hashchange', switchTab, false);
+  })();
+  </script><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/css/custom.css?v=0cc67a65"><link rel="stylesheet" href="https://unpkg.com/arcade-shelf@0.2.2/dist/style.css"><link rel="stylesheet" href="/css/arcade-shelf-override.css?v=722793b0"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Logs" type="application/atom+xml">
+</head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.gif" alt="Logs" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">Home</a><a class="navbar-item" href="/gallery">Gallery</a><a class="navbar-item" href="/about">About</a></div><div class="navbar-end"><a class="navbar-item is-hidden-tablet catalogue" title="Catalogue" href="javascript:;"><i class="fas fa-list-ul"></i></a><a class="navbar-item search" title="Search" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-8-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item">Posted&nbsp;<time dateTime="2021-11-19T21:45:55.000Z" title="11/19/2021, 9:45:55 PM">2021-11-19</time></span><span class="level-item"><a class="link-muted" href="/categories/coding/">coding</a></span><span class="level-item">7 minutes read (About 1023 words)</span><span class="level-item" id="busuanzi_container_page_pv"><span id="busuanzi_value_page_pv">0</span>&nbsp;visits</span></div></div><h1 class="title is-3 is-size-4-mobile">完美转发</h1><div class="content"><p>Reference collapse and perfect forwarding <span id="more"></span></p>
+<h1 id="转发问题"><a href="#转发问题" class="headerlink" title="转发问题"></a>转发问题</h1><p>假设我们有一个工厂函数，它会创建一个对象并返回，同时将接收到的参数传递给对象的构造函数：</p>
+<figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span>... Args&gt;</span></span><br><span class="line"><span class="function">std::unique_ptr&lt;T&gt; <span class="title">make</span><span class="params">(Args&amp;... args)</span> </span>{</span><br><span class="line">    <span class="keyword">return</span> std::<span class="built_in">make_unique</span>&lt;T&gt;(args...);</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这样实现会有两个问题，</p>
+<ol>
+<li>无法接收右值：参数被声明为左值引用 <code>Args&amp;...</code>，因此不能绑定到右值，例如临时对象或整数字面量。比如 <code>make&lt;int&gt;(42)</code> 无法通过编译。</li>
+<li>丢失移动语义：即使将参数改为 <code>Args&amp;&amp;...</code> 以同时接收左值和右值，在 <code>make</code> 函数内部，每个有名字的参数 <code>args</code> 作为表达式时都是左值。因此直接使用 <code>args...</code> 会把所有参数都以左值传递给 <code>T</code> 的构造函数，无法保留调用者传入时的左值/右值特性。当构造函数对左值和右值有不同重载时，右值对应的重载 (例如移动构造函数) 不会被调用。</li>
+</ol>
+<p>所以，我们需要一种方案，来接收可推导的左值或右值参数，并且在转发时保留其左值/右值性质和 <code>const</code> 等限定。</p>
+<h1 id="Reference-collapsing"><a href="#Reference-collapsing" class="headerlink" title="Reference collapsing"></a>Reference collapsing</h1><p>c++ 不允许直接写出 “引用的引用”，例如 <code>int&amp; &amp;</code>。但通过模板参数、类型别名等间接形成这种组合时，会发生引用折叠。c++11 中的规则如下：</p>
+<ul>
+<li><code>T&amp; &amp;   --&gt; T&amp;</code></li>
+<li><code>T&amp; &amp;&amp;  --&gt; T&amp;</code></li>
+<li><code>T&amp;&amp; &amp;  --&gt; T&amp;</code></li>
+<li><code>T&amp;&amp; &amp;&amp; --&gt; T&amp;&amp;</code></li>
+</ul>
+<p>也就是说，只有两个右值引用会被折叠为右值引用，其他情况都会折叠为左值引用。</p>
+<h1 id="Universal-references"><a href="#Universal-references" class="headerlink" title="Universal references"></a>Universal references</h1><p>万能引用是基于引用折叠实现的，其形式和右值引用一样，都是 <code>&amp;&amp;</code>。万能引用能同时匹配左值和右值。</p>
+<figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">func</span><span class="params">(T&amp;&amp; arg)</span> </span>{</span><br><span class="line">    <span class="comment">// do something</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> a = <span class="number">1</span>;</span><br><span class="line"><span class="built_in">func</span>(a);    <span class="comment">// ok</span></span><br><span class="line"><span class="built_in">func</span>(<span class="number">3</span>);    <span class="comment">// ok</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>这里的万能引用 (标准中称为转发引用) 要求 <code>T&amp;&amp;</code> 中的 <code>T</code> 是参与本次函数调用<strong>类型推导</strong>的、没有 <code>const</code>/<code>volatile</code> 限定的模板类型参数。<code>auto&amp;&amp;</code> 在通常的类型推导中也有类似作用 (花括号初始化列表除外)。</p>
+<p>假设实参的类型为 <code>A</code>。当传入的是左值时，<code>T</code> 被推导为 <code>A&amp;</code>，参数类型变为 <code>A&amp; &amp;&amp;</code>，折叠后为 <code>A&amp;</code>；当传入的是右值时，<code>T</code> 被推导为 <code>A</code>，参数类型为 <code>A&amp;&amp;</code>。这里 <code>A</code> 保留实参的 <code>const</code>/<code>volatile</code> 限定。</p>
+<h1 id="std-forward"><a href="#std-forward" class="headerlink" title="std::forward"></a>std::forward</h1><p>c++11 引入了一个新的函数 <code>forward</code> 来帮助实现完美转发。下面是 <code>forward</code> 的实现 (c++14)：</p>
+<figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="keyword">constexpr</span> T&amp;&amp; <span class="title">forward</span><span class="params">(std::<span class="type">remove_reference_t</span>&lt;T&gt;&amp; t)</span> <span class="keyword">noexcept</span> </span>{</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">static_cast</span>&lt;T&amp;&amp;&gt;(t);</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="keyword">constexpr</span> T&amp;&amp; <span class="title">forward</span><span class="params">(std::<span class="type">remove_reference_t</span>&lt;T&gt;&amp;&amp; t)</span> <span class="keyword">noexcept</span> </span>{</span><br><span class="line">    <span class="built_in">static_assert</span>(!std::is_lvalue_reference&lt;T&gt;::value,</span><br><span class="line">                  <span class="string">"cannot forward an rvalue as an lvalue"</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">static_cast</span>&lt;T&amp;&amp;&gt;(t);</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p>注：c++11 中需用 <code>typename std::remove_reference&lt;T&gt;::type</code> 替换 <code>std::remove_reference_t&lt;T&gt;</code>。</p>
+</blockquote>
+<p>以传入左值引用为例，当我们用 <code>A&amp;</code> 作为模板实参实例化 <code>forward</code> 时，代入过程可以写成下面的示意 (并非可直接编译)：</p>
+<figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">constexpr</span> A&amp; &amp;&amp; <span class="title">forward</span><span class="params">(std::<span class="type">remove_reference_t</span>&lt;A&amp;&gt;&amp; t)</span> <span class="keyword">noexcept</span> </span>{</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">static_cast</span>&lt;A&amp; &amp;&amp;&gt;(t);</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>经过 remove reference 和引用折叠后，<code>forward</code> 变为：</p>
+<figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">constexpr</span> A&amp; <span class="title">forward</span><span class="params">(A&amp; t)</span> <span class="keyword">noexcept</span> </span>{</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">static_cast</span>&lt;A&amp;&gt;(t);</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>如果直接传入右值，例如 <code>std::forward&lt;A&gt;(A{})</code>，就会使用第二个重载。代入过程可以写成下面的示意 (并非可直接编译)：</p>
+<figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">constexpr</span> A&amp;&amp; &amp;&amp; <span class="title">forward</span><span class="params">(std::<span class="type">remove_reference_t</span>&lt;A&amp;&amp;&gt;&amp;&amp; t)</span> <span class="keyword">noexcept</span> </span>{</span><br><span class="line">    <span class="built_in">static_assert</span>(!std::is_lvalue_reference&lt;A&gt;::value,</span><br><span class="line">                  <span class="string">"cannot forward an rvalue as an lvalue"</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">static_cast</span>&lt;A&amp;&amp; &amp;&amp;&gt;(t);</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>折叠后参数类型为 <code>A&amp;&amp;</code>。这里的断言也成立，省略断言后就是：</p>
+<figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">constexpr</span> A&amp;&amp; <span class="title">forward</span><span class="params">(A&amp;&amp; t)</span> <span class="keyword">noexcept</span> </span>{</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">static_cast</span>&lt;A&amp;&amp;&gt;(t);</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>需要注意的是，<code>std::forward</code> 只能显式指定模板参数后使用 (如 <code>std::forward&lt;T&gt;(arg)</code>)，不能进行类型推导。</p>
+<p>至此，我们一开始的转发问题便得到了解决：</p>
+<figure class="highlight c++"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span>... Args&gt;</span></span><br><span class="line"><span class="function">std::unique_ptr&lt;T&gt; <span class="title">make</span><span class="params">(Args&amp;&amp;... args)</span> </span>{</span><br><span class="line">    <span class="keyword">return</span> std::<span class="built_in">make_unique</span>&lt;T&gt;(</span><br><span class="line">        std::forward&lt;Args&gt;(args)...</span><br><span class="line">    );</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><blockquote>
+<p><a target="_blank" rel="noopener" href="https://en.cppreference.com/w/cpp/utility/forward">std::forward</a></p>
+<p><a target="_blank" rel="noopener" href="http://thbecker.net/articles/rvalue_references/section_01.html">C++ Rvalue References Explained</a></p>
+</blockquote>
+</div><div class="article-licensing box"><div class="licensing-title"><p>完美转发</p><p><a href="http://shixuan.github.io/2021/11/19/perfect-forwarding/">http://shixuan.github.io/2021/11/19/perfect-forwarding/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>Author</h6><p>shixuan</p></div></div><div class="level-item is-narrow"><div><h6>Posted on</h6><p>2021-11-19</p></div></div><div class="level-item is-narrow"><div><h6>Licensed under</h6><p><a class="icons" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="icon fab fa-creative-commons"></i></a><a class="icons" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="icon fab fa-creative-commons-by"></i></a><a class="icons" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="icon fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><div class="article-tags is-size-7 mb-4"><span class="mr-2">#</span><a class="link-muted mr-2" rel="tag" href="/tags/cpp/">cpp</a></div><div class="addthis_inline_share_toolbox"></div><script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5f36627a4fb687b2" defer></script></article></div><div class="card"><div class="card-content"><h3 class="menu-label has-text-centered">Like this article? Support the author with</h3><div class="buttons is-centered"><a class="button donate" href="https://www.buymeacoffee.com/shixuan" target="_blank" rel="noopener" data-type="buymeacoffee"><span class="icon is-small"><i class="fas fa-coffee"></i></span><span>Buy me a coffee</span></a></div></div></div><nav class="post-navigation mt-4 level is-mobile"><div class="level-start"><a class="article-nav-prev level level-item link-muted" href="/2026/03/28/cloudflare-r2-photo-gallery/"><i class="level-item fas fa-chevron-left"></i><span class="level-item">Cloudflare R2 个人相册方案</span></a></div><div class="level-end"><a class="article-nav-next level level-item link-muted" href="/2021/10/16/move-semantics/"><span class="level-item">移动语义</span><i class="level-item fas fa-chevron-right"></i></a></div></nav><div class="card" id="comments"><div class="card-content"><h3 class="title is-5">Comments</h3><script src="https://giscus.app/client.js" repo="shixuan/shixuan.github.io" data-repo="shixuan/shixuan.github.io" data-repo-id="MDEwOlJlcG9zaXRvcnkyMjY5MDc3OTE=" data-category-id="DIC_kwDODYZWj84CswDG" data-category="Announcements" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="top" data-theme="light" data-lang="en" data-loading="lazy" crossorigin="anonymous" async></script></div></div></div><div class="column column-left is-4-tablet is-4-desktop is-4-widescreen  order-1 is-sticky"><div class="card widget" id="toc" data-type="toc"><div class="card-content"><div class="menu"><h3 class="menu-label">Catalogue</h3><ul class="menu-list"><li><a class="level is-mobile" href="#转发问题"><span class="level-left"><span class="level-item">1</span><span class="level-item">转发问题</span></span></a></li><li><a class="level is-mobile" href="#Reference-collapsing"><span class="level-left"><span class="level-item">2</span><span class="level-item">Reference collapsing</span></span></a></li><li><a class="level is-mobile" href="#Universal-references"><span class="level-left"><span class="level-item">3</span><span class="level-item">Universal references</span></span></a></li><li><a class="level is-mobile" href="#std-forward"><span class="level-left"><span class="level-item">4</span><span class="level-item">std::forward</span></span></a></li><li><a class="level is-mobile" href="#Reference"><span class="level-left"><span class="level-item">5</span><span class="level-item">Reference</span></span></a></li></ul></div></div><style>#toc .menu-list > li > a.is-active + .menu-list { display: block; }#toc .menu-list > li > a + .menu-list { display: none; }</style><script src="/js/toc.js" defer></script></div></div><!--!--></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/img/logo.gif" alt="Logs" height="28"></a><p class="is-size-7"><span>&copy; 2026 shixuan</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a><br><span id="busuanzi_container_site_uv">Visited by <span id="busuanzi_value_site_uv">0</span> users</span></p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Archives" href="/archives"><i class="fas fa-box-archive"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/shixuan"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("en");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script data-pjax src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="Back to top" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script data-pjax src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "This website uses cookies to improve your experience.",
+          dismiss: "Got it!",
+          allow: "Allow cookies",
+          deny: "Decline",
+          link: "Learn more",
+          policy: "Cookie Policy",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><script type="text/javascript" id="MathJax-script" async>MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      },
+      svg: {
+        fontCache: 'global'
+      },
+      chtml: {
+        matchFontHeight: false
+      }
+    };</script><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><!--!--><script data-pjax src="/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="Type something..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script data-pjax src="/js/insight.js" defer></script><script data-pjax>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"Type something...","untitled":"(Untitled)","posts":"Posts","pages":"Pages","categories":"Categories","tags":"Tags"});
+        });</script><!-- hexo injector body_end start --><script src="https://unpkg.com/arcade-shelf@0.2.2/dist/index.umd.cjs" defer></script><script src="/js/arcade-shelf-init.js?v=d6b6c512" defer></script><!-- hexo injector body_end end --></body></html>

@@ -1,0 +1,165 @@
+/* ── Devlog list (About page) ───────────────────────────────── */
+.devlog-list {
+  list-style: none;
+  margin: .5rem 0 0;
+  padding: 0;
+}
+.devlog-list li {
+  padding: .35rem 0;
+  border-bottom: 1px dashed #eee;
+  font-size: .95rem;
+}
+.devlog-list li:last-child {
+  border-bottom: none;
+}
+.devlog-list .devlog-date {
+  color: #999;
+  font-size: .85rem;
+  margin-left: .25rem;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   蓝色配色 + 字体方案
+   主色蓝 #3273dc · 文字 hover #5B8DE8 · 按钮 hover #2860C4 · 浅底 #E8F0FB
+   背景 浅灰 #f7f7f7 / 卡片 纯白
+   字体：全部使用主题默认，仅导航栏额外加粗体 + 全大写
+   导航栏：logo 左上角放大，菜单与搜索图标靠右并下沉
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── 导航栏：默认字体，semi-bold ──────────────────────────────── */
+.navbar-item {
+  font-family: "Newsreader", serif;
+  font-weight: 580 !important;
+  /* 比正文的 1.1rem 大一级。root 是 14px，所以这是 17.5px。 */
+  font-size: 1.25rem !important;
+}
+
+/* ── 背景：浅灰（主题原始 #f7f7f7）/ 卡片：纯白 ──────────────── */
+body, html, .has-background { background-color: #f7f7f7 !important; }
+.card { background-color: #ffffff !important; }
+
+/* ── 导航栏：logo 放大 + 右侧靠右下沉 ─────────────────────────── */
+/* height 和 max-height 都要写，navbar.jsx 在 img 上硬编码了
+   height="28" 属性，只给 max-height 的话高度还是 28。
+   导航栏高度是 logo 高 + 40px，因为主题把 .navbar-item 的上下 padding
+   改成了 1.25rem。.navbar-brand 的 min-height 52px 早被撑破，不是约束。 */
+.navbar-main .navbar-logo img {
+  height: 36px;
+  max-height: 36px;
+}
+
+/* 菜单和搜索图标一起靠右并下沉，跟居中的 logo 形成不对称。
+   .navbar-start 吃掉 margin-left: auto 把两者顶到右边，.navbar-end 只留固定
+   间距，不能再用 auto，否则剩余空间会在两者之间再分一次，中间裂一道缝。
+   下沉走 padding 一加一减而不是 position/transform，因为 .navbar-container
+   是 overflow-x: auto，overflow-y 会跟着算成 auto，位移撑出去会冒竖直滚动条。
+   改 padding 则元素总高不变，只有文字往下走。
+   1087px 以下主题自己会把菜单居中堆叠，那一档不动。 */
+@media screen and (min-width: 1088px) {
+  .navbar-main .navbar-start {
+    margin-left: auto;
+    margin-right: 0;
+  }
+  .navbar-main .navbar-end {
+    margin-left: 2rem;
+  }
+  /* 主题原值上下都是 1.25rem，这里 +10px / -10px */
+  .navbar-main .navbar-menu .navbar-item {
+    padding-top: 1.875rem;
+    padding-bottom: 0.625rem;
+  }
+}
+
+/* ── 链接：默认红，hover 淡红 ─────────────────────────────────── */
+a { color: #3273dc; }
+a:hover, a:focus { color: #5B8DE8; }
+.link-muted:hover { color: #5B8DE8 !important; }   /* 卡片标题 */
+
+/* ── Navbar：hover/激活 淡红 ──────────────────────────────────── */
+.navbar-item.is-active,
+.navbar-item:hover { color: #5B8DE8 !important; }
+
+/* ── 侧边栏菜单激活：淡红底 + 红字 ───────────────────────────── */
+.menu-list a.is-active {
+  background-color: #E8F0FB;
+  color: #3273dc;
+}
+
+/* ── 文章标题 hover：淡红 ─────────────────────────────────────── */
+.article-title:hover,
+.article-header-title a:hover { color: #5B8DE8 !important; }
+
+/* ── 主色按钮 / 归档年份标签：红 ─────────────────────────────── */
+.button.is-primary { background-color: #3273dc; border-color: transparent; }
+.button.is-primary:hover,
+.button.is-primary:focus { background-color: #2860C4; }
+.tag.is-primary { background-color: #3273dc !important; color: #fff !important; }
+
+/* ── 分页按钮：当前页红，hover 描边淡红 ─────────────────────── */
+.pagination-link.is-current { background-color: #3273dc !important; border-color: #3273dc !important; }
+.pagination-link:hover, .pagination-previous:hover, .pagination-next:hover {
+  border-color: #5B8DE8 !important; color: #3273dc !important;
+}
+
+/* ── Widget 首个标签：红 ──────────────────────────────────────── */
+.widget .tags .tag:first-child { background-color: #3273dc; }
+
+/* ── 搜索激活态：红 ───────────────────────────────────────────── */
+.searchbox .result .item.active { background-color: #3273dc; }
+.searchbox .result .pagination .button.is-current { background-color: #3273dc; }
+
+/* ── 顶部加载条：红 ───────────────────────────────────────────── */
+#nprogress .bar { background: #3273dc; }
+#nprogress .spinner-icon {
+  border-top-color: #3273dc;
+  border-left-color: #3273dc;
+}
+
+/* ── Cookie 同意按钮：红 ──────────────────────────────────────── */
+.cc-btn.cc-allow { background-color: #3273dc !important; }
+
+/* ── Profile widget: hide the posts/categories/tags counter row.
+   profile.jsx has no config switch for this row, so CSS-hide is
+   the lightest path that survives theme reinstalls. Social links
+   row uses .is-multiline, so the :not() keeps it visible. ────── */
+.card.widget[data-type="profile"] .level.is-mobile:not(.is-multiline) {
+  display: none !important;
+}
+
+/* ── Profile widget 增强（默认字体，仅做层次和分隔）─────────── */
+/* 名字：保留放大 + semi-bold，建立 hierarchy（字体走主题默认） */
+.card.widget[data-type="profile"] .title.is-size-4 {
+  font-weight: 500 !important;
+  font-size: 1.6rem !important;
+  margin-top: .4rem;
+}
+/* 社交图标行：hairline 分隔 + 图标加大 + hover 主题蓝 */
+.card.widget[data-type="profile"] .level.is-multiline {
+  border-top: 1px solid #ececec;
+  padding-top: .75rem;
+  margin-top: .75rem !important;
+}
+.card.widget[data-type="profile"] .level.is-multiline .button.is-transparent i {
+  font-size: 1.25rem;
+  transition: color .15s ease;
+}
+.card.widget[data-type="profile"] .level.is-multiline .button.is-transparent:hover {
+  color: #3273dc !important;
+}
+
+/* ── Pinned announcement post ────────────────────────────────── */
+.card:has(.message) .article-meta {
+  display: none !important;
+}
+
+.card:has(.message) .article::before {
+  content: "\f08d\00a0\00a0Pinned";
+  font-family: "Font Awesome 5 Free", "Font Awesome 6 Free", sans-serif;
+  font-weight: 900;
+  font-size: .72rem;
+  color: #3273dc;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  display: block;
+  margin-bottom: .65rem;
+}

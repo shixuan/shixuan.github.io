@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>Devlog 0006 — 为 Hexo 接入 Decap 网页写作后台 - Logs</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="Logs"><meta name="msapplication-TileImage" content="/img/favicon.ico"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Logs"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="Context原来的写作流程是本地编辑 Markdown，提交到私有源码仓库，再由 GitHub Actions 运行 Hexo，将生成的静态文件发布到公开站点。想加一个网页编辑入口，出门时也能写文章、存草稿，同时继续使用现有的文件格式、Git 历史和部署流程。 最后接入 Decap CMS：编辑器在浏览器里运行，直接通过 GitHub API 管理 Markdown；登录认证交给独立的 Clou"><meta property="og:type" content="blog"><meta property="og:title" content="Devlog 0006 — 为 Hexo 接入 Decap 网页写作后台"><meta property="og:url" content="http://shixuan.github.io/devlog/0006-decap-cms.html"><meta property="og:site_name" content="Logs"><meta property="og:description" content="Context原来的写作流程是本地编辑 Markdown，提交到私有源码仓库，再由 GitHub Actions 运行 Hexo，将生成的静态文件发布到公开站点。想加一个网页编辑入口，出门时也能写文章、存草稿，同时继续使用现有的文件格式、Git 历史和部署流程。 最后接入 Decap CMS：编辑器在浏览器里运行，直接通过 GitHub API 管理 Markdown；登录认证交给独立的 Clou"><meta property="og:locale" content="en_US"><meta property="og:image" content="http://shixuan.github.io/img/og_image.png"><meta property="article:published_time" content="2026-09-20T00:00:00.000Z"><meta property="article:author" content="shixuan"><meta property="twitter:card" content="summary"><meta property="twitter:image:src" content="http://shixuan.github.io/img/og_image.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://shixuan.github.io/devlog/0006-decap-cms.html"},"headline":"Devlog 0006 — 为 Hexo 接入 Decap 网页写作后台","image":["http://shixuan.github.io/img/og_image.png"],"datePublished":"2026-09-20T00:00:00.000Z","author":{"@type":"Person","name":"shixuan"},"publisher":{"@type":"Organization","name":"Logs","logo":{"@type":"ImageObject","url":"http://shixuan.github.io/img/logo.gif"}},"description":"Context原来的写作流程是本地编辑 Markdown，提交到私有源码仓库，再由 GitHub Actions 运行 Hexo，将生成的静态文件发布到公开站点。想加一个网页编辑入口，出门时也能写文章、存草稿，同时继续使用现有的文件格式、Git 历史和部署流程。 最后接入 Decap CMS：编辑器在浏览器里运行，直接通过 GitHub API 管理 Markdown；登录认证交给独立的 Clou"}</script><link rel="canonical" href="http://shixuan.github.io/devlog/0006-decap-cms.html"><link rel="icon" href="/img/favicon.ico"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0/css/all.css"><link data-pjax rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link data-pjax rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" defer></script><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/css/justifiedGallery.min.css"><script src="https://www.googletagmanager.com/gtag/js?id=UA-175447554-1" async></script><script>window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+    
+        gtag('config', 'UA-175447554-1');</script><!--!--><!--!--><style>.pace{-webkit-pointer-events:none;pointer-events:none;-webkit-user-select:none;-moz-user-select:none;user-select:none}.pace-inactive{display:none}.pace .pace-progress{background:#3273dc;position:fixed;z-index:2000;top:0;right:100%;width:100%;height:2px}</style><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><!-- hexo injector head_end start --><script>
+  (function () {
+      function switchTab() {
+          if (!location.hash) {
+            return;
+          }
+
+          const id = '#' + CSS.escape(location.hash.substring(1));
+          const $tabMenu = document.querySelector(`.tabs a[href="${id}"]`);
+          if (!$tabMenu) {
+            return;
+          }
+
+          const $tabMenuContainer = $tabMenu.parentElement.parentElement;
+          Array.from($tabMenuContainer.children).forEach($menu => $menu.classList.remove('is-active'));
+          Array.from($tabMenuContainer.querySelectorAll('a'))
+              .map($menu => document.getElementById($menu.getAttribute("href").substring(1)))
+              .forEach($content => $content.classList.add('is-hidden'));
+
+          if ($tabMenu) {
+              $tabMenu.parentElement.classList.add('is-active');
+          }
+          const $activeTab = document.querySelector(id);
+          if ($activeTab) {
+              $activeTab.classList.remove('is-hidden');
+          }
+      }
+      switchTab();
+      window.addEventListener('hashchange', switchTab, false);
+  })();
+  </script><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/css/custom.css?v=0cc67a65"><link rel="stylesheet" href="https://unpkg.com/arcade-shelf@0.2.2/dist/style.css"><link rel="stylesheet" href="/css/arcade-shelf-override.css?v=722793b0"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Logs" type="application/atom+xml">
+</head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.gif" alt="Logs" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">Home</a><a class="navbar-item" href="/gallery">Gallery</a><a class="navbar-item" href="/about">About</a></div><div class="navbar-end"><a class="navbar-item is-hidden-tablet catalogue" title="Catalogue" href="javascript:;"><i class="fas fa-list-ul"></i></a><a class="navbar-item search" title="Search" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-8-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item">Posted&nbsp;<time dateTime="2026-09-20T00:00:00.000Z" title="9/20/2026, 12:00:00 AM">2026-09-20</time></span><span class="level-item">15 minutes read (About 2216 words)</span><span class="level-item" id="busuanzi_container_page_pv"><span id="busuanzi_value_page_pv">0</span>&nbsp;visits</span></div></div><h1 class="title is-3 is-size-4-mobile">Devlog 0006 — 为 Hexo 接入 Decap 网页写作后台</h1><div class="content"><h1 id="Context"><a href="#Context" class="headerlink" title="Context"></a>Context</h1><p>原来的写作流程是本地编辑 Markdown，提交到私有源码仓库，再由 GitHub Actions 运行 Hexo，将生成的静态文件发布到公开站点。想加一个网页编辑入口，出门时也能写文章、存草稿，同时继续使用现有的文件格式、Git 历史和部署流程。</p>
+<p>最后接入 Decap CMS：编辑器在浏览器里运行，直接通过 GitHub API 管理 Markdown；登录认证交给独立的 Cloudflare Worker；文章发布仍然走原来的 CI。</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">浏览器中的 Decap</span><br><span class="line">  ├── 登录 → GitHub OAuth + 认证 Worker</span><br><span class="line">  └── 编辑 → 私有源码仓库中的 Markdown</span><br><span class="line">                 ├── 保存草稿 → 分支和 PR</span><br><span class="line">                 └── 发布 → 合并到发布分支</span><br><span class="line">                                ↓</span><br><span class="line">                         GitHub Actions</span><br><span class="line">                                ↓</span><br><span class="line">                           Hexo 构建</span><br><span class="line">                                ↓</span><br><span class="line">                         公开的静态博客</span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="Implementation"><a href="#Implementation" class="headerlink" title="Implementation"></a>Implementation</h1><h2 id="HTML-加载程序，YAML-描述内容"><a href="#HTML-加载程序，YAML-描述内容" class="headerlink" title="HTML 加载程序，YAML 描述内容"></a>HTML 加载程序，YAML 描述内容</h2><p>Decap 是完整的前端应用。博客只需要一个入口 HTML，加载固定版本的 Decap JavaScript，再提供同目录的配置文件。编辑器、文章列表和发布按钮都由 Decap 生成。</p>
+<p>配置文件描述仓库后端、文章目录，以及标题、日期、标签、分类、正文等字段。Decap 根据这些字段生成表单，并把编辑结果写回 Markdown 的 YAML front matter 和正文。</p>
+<p>后台文件放在 Hexo 的 source 目录中，通过 <code>skip_render</code> 原样复制到构建产物。因此，后台使用 Decap 自己的界面，不套 Icarus 主题；发布出来的文章仍由 Hexo 和 Icarus 渲染。界面语言设置为英文。</p>
+<p>这里没有引入保存文章内容的数据库。Git 仓库仍然是内容来源，本地编辑和网页编辑可以并用。</p>
+<h2 id="Worker-只负责登录认证"><a href="#Worker-只负责登录认证" class="headerlink" title="Worker 只负责登录认证"></a>Worker 只负责登录认证</h2><p>登录时，Decap 打开 GitHub 授权窗口。用户同意后，GitHub 把临时授权码送到预先登记的回调地址；Worker 在服务端交换访问令牌，再通过弹窗消息交给 Decap。之后读取文章、创建提交和合并 PR，由浏览器中的 Decap 调用 GitHub API 完成。</p>
+<p>这次实现对登录请求使用随机 <code>state</code> 和 PKCE 校验，通过短期、HttpOnly、Secure 的 cookie 关联浏览器会话。回传令牌时同时检查消息来源和窗口身份，只发送到配置的编辑器来源。认证响应禁用缓存，应用密钥保存在 Worker secrets 中。</p>
+<p>回调地址是公开的服务入口，不是凭证。需要保护的是应用密钥、临时授权码和访问令牌，不能把它们写进文章、静态配置或调试日志。Decap 最终需要在浏览器中持有令牌，所以后台脚本和浏览器环境仍然属于信任边界。固定脚本版本用于控制升级，并不意味着第三方脚本没有风险。</p>
+<p>私有仓库的传统 OAuth 接入使用 <code>repo</code> scope，权限范围并非只限于这一个博客仓库。这是当前方案的取舍，不能把配置中的仓库路径当作令牌的权限边界。</p>
+<h2 id="草稿使用分支和-PR"><a href="#草稿使用分支和-PR" class="headerlink" title="草稿使用分支和 PR"></a>草稿使用分支和 PR</h2><p>启用 Decap 的编辑流程：</p>
+<figure class="highlight yaml"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">publish_mode:</span> <span class="string">editorial_workflow</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>保存草稿时，内容进入独立分支，并产生 PR；点击发布后，变更合并到发布分支，触发原来的 CI。这样可以多次保存，不必每写一点就更新公开博客。</p>
+<p>这里的草稿机制与 Hexo 的 <code>source/_drafts/</code> 无关，也不依赖给文章填一个未来日期。日期字段仍是文章元数据，不能代替定时发布任务。</p>
+<h2 id="适配已有文章"><a href="#适配已有文章" class="headerlink" title="适配已有文章"></a>适配已有文章</h2><p>博客的文章链接由年月日和 <code>id</code> 组成，因此编辑旧文章时要保留这两个字段。新文章使用唯一的 <code>id</code> 生成文件名；已有文章中包含加号的标识也需要通过校验，避免为了适配后台而改变旧链接。</p>
+<p>标签和分类使用简单列表控件，兼容已有的单个字符串和数组写法。保存时字符串可能被序列化成数组；分类数组在 Hexo 中表示分类层级，需要按原来的含义填写。</p>
+<p>正文采用 Markdown 源码模式，便于保留 Hexo 特殊语法和摘要分隔符。图片直接粘贴图床链接，缩略图字段也填写 URL。这次没有接入图片上传，也没有调整已有的网页资源目录。</p>
+<p>编辑器里的预览只是写作参考，不是完整的 Icarus 页面预览。最终排版仍以 Hexo 构建结果为准。</p>
+<h2 id="给预览补上-MathJax"><a href="#给预览补上-MathJax" class="headerlink" title="给预览补上 MathJax"></a>给预览补上 MathJax</h2><p>博客主题已经加载 MathJax，但 Decap 预览运行在独立的 iframe 中，不会继承主题的公式渲染。只在后台多加载一个 MathJax 脚本也不够：正文先经过 Markdown 解析，公式里的反斜杠和下划线可能已经被改写。</p>
+<p>这次通过 Decap 的 <code>registerPreviewTemplate</code> 注册文章预览。先用 markdown-it 和数学语法插件把 TeX 从普通 Markdown 中识别出来，保留公式原文，再用 MathJax 3.2.2 转换为 SVG。SVG 不依赖预览 iframe 之外的字体缓存，便于放进独立文档。</p>
+<p>预览支持行内的 <code>$...$</code>、<code>\(...\)</code> 和独立公式的 <code>$$...$$</code>、<code>\[...\]</code>，代码块及行内代码保持原样。表单增加 <code>MathJax</code> 开关，新文章默认开启；这个开关控制后台预览，公开页面仍由主题的全局配置决定是否加载 MathJax。</p>
+<p>实时编辑时稍作延迟再排版，公式转换串行执行，并检查当前内容版本，避免较慢的旧渲染覆盖最新正文。React 管理预览容器，渲染逻辑管理容器内部的内容，防止两者同时修改公式节点。这些处理只影响预览，不会重写文章源文件。</p>
+<p>接入后还遇到过公式看起来重复显示的问题。SVG 转换结果中附带了供屏幕阅读器使用的 MathML，而预览 iframe 没有带上 MathJax 的完整样式，辅助内容也被浏览器画了出来。修复是在预览文档中安装 MathJax 生成的样式表，让辅助内容按预期视觉隐藏，同时保留可访问性。检查时除了统计公式节点，也需要看实际显示效果和辅助节点的计算样式。</p>
+<p>依赖使用固定 CDN 版本。原始 HTML 按文本展示，Hexo 标签不在预览中执行；MathJax 加载或转换失败时保留未排版的内容并显示提示。公式预览依然不是完整的主题预览。</p>
+<h1 id="Verification"><a href="#Verification" class="headerlink" title="Verification"></a>Verification</h1><p>本地构建检查确认后台 HTML 和配置原样输出，并检查现有普通文章的 <code>id</code> 是否符合后台校验规则。认证代码用模拟 GitHub 响应和窗口消息的测试覆盖正常交换、无效或过期的登录状态、错误来源消息以及上游失败。</p>
+<p>线上用测试文章完成了 GitHub 登录、读取文章列表、保存草稿、生成 PR 和正式发布验证。发布后 CI 正常生成博客页面，网页写作与原来的静态部署流程接通。</p>
+<p>公式预览另外做了本地浏览器验证，检查行内与独立公式、矩阵、代码示例、HTML 转义、连续编辑和开关切换。两篇现有数学文章分别转换出 20 个和 7 个公式，没有 TeX 错误；实际 Decap 入口的依赖加载也通过检查。这部分属于本地验证，不能代替部署后的浏览器检查。</p>
+<h1 id="Notes"><a href="#Notes" class="headerlink" title="Notes"></a>Notes</h1><p>日常操作变成：打开编辑器，写 Markdown，保存草稿，准备好后发布。回到本地写作前先同步远端提交，避免本地文件落后于网页上的修改。</p>
+<p>升级 Decap 时显式更新固定版本，并重新检查登录、旧文章字段和草稿发布流程。公开记录只保留架构与配置原则，实际仓库标识、认证域名和凭证不作为示例展开。</p>
+</div><div class="article-licensing box"><div class="licensing-title"><p>Devlog 0006 — 为 Hexo 接入 Decap 网页写作后台</p><p><a href="http://shixuan.github.io/devlog/0006-decap-cms.html">http://shixuan.github.io/devlog/0006-decap-cms.html</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>Author</h6><p>shixuan</p></div></div><div class="level-item is-narrow"><div><h6>Posted on</h6><p>2026-09-20</p></div></div><div class="level-item is-narrow"><div><h6>Licensed under</h6><p><a class="icons" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="icon fab fa-creative-commons"></i></a><a class="icons" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="icon fab fa-creative-commons-by"></i></a><a class="icons" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="icon fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><div class="addthis_inline_share_toolbox"></div><script src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5f36627a4fb687b2" defer></script></article></div><div class="card"><div class="card-content"><h3 class="menu-label has-text-centered">Like this article? Support the author with</h3><div class="buttons is-centered"><a class="button donate" href="https://www.buymeacoffee.com/shixuan" target="_blank" rel="noopener" data-type="buymeacoffee"><span class="icon is-small"><i class="fas fa-coffee"></i></span><span>Buy me a coffee</span></a></div></div></div><div class="card" id="comments"><div class="card-content"><h3 class="title is-5">Comments</h3><script src="https://giscus.app/client.js" repo="shixuan/shixuan.github.io" data-repo="shixuan/shixuan.github.io" data-repo-id="MDEwOlJlcG9zaXRvcnkyMjY5MDc3OTE=" data-category-id="DIC_kwDODYZWj84CswDG" data-category="Announcements" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="top" data-theme="light" data-lang="en" data-loading="lazy" crossorigin="anonymous" async></script></div></div></div><div class="column column-left is-4-tablet is-4-desktop is-4-widescreen  order-1 is-sticky"><div class="card widget" id="toc" data-type="toc"><div class="card-content"><div class="menu"><h3 class="menu-label">Catalogue</h3><ul class="menu-list"><li><a class="level is-mobile" href="#Context"><span class="level-left"><span class="level-item">1</span><span class="level-item">Context</span></span></a></li><li><a class="level is-mobile" href="#Implementation"><span class="level-left"><span class="level-item">2</span><span class="level-item">Implementation</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#HTML-加载程序，YAML-描述内容"><span class="level-left"><span class="level-item">2.1</span><span class="level-item">HTML 加载程序，YAML 描述内容</span></span></a></li><li><a class="level is-mobile" href="#Worker-只负责登录认证"><span class="level-left"><span class="level-item">2.2</span><span class="level-item">Worker 只负责登录认证</span></span></a></li><li><a class="level is-mobile" href="#草稿使用分支和-PR"><span class="level-left"><span class="level-item">2.3</span><span class="level-item">草稿使用分支和 PR</span></span></a></li><li><a class="level is-mobile" href="#适配已有文章"><span class="level-left"><span class="level-item">2.4</span><span class="level-item">适配已有文章</span></span></a></li><li><a class="level is-mobile" href="#给预览补上-MathJax"><span class="level-left"><span class="level-item">2.5</span><span class="level-item">给预览补上 MathJax</span></span></a></li></ul></li><li><a class="level is-mobile" href="#Verification"><span class="level-left"><span class="level-item">3</span><span class="level-item">Verification</span></span></a></li><li><a class="level is-mobile" href="#Notes"><span class="level-left"><span class="level-item">4</span><span class="level-item">Notes</span></span></a></li></ul></div></div><style>#toc .menu-list > li > a.is-active + .menu-list { display: block; }#toc .menu-list > li > a + .menu-list { display: none; }</style><script src="/js/toc.js" defer></script></div></div><!--!--></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/img/logo.gif" alt="Logs" height="28"></a><p class="is-size-7"><span>&copy; 2026 shixuan</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a><br><span id="busuanzi_container_site_uv">Visited by <span id="busuanzi_value_site_uv">0</span> users</span></p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Archives" href="/archives"><i class="fas fa-box-archive"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/shixuan"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("en");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script data-pjax src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="Back to top" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script data-pjax src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "This website uses cookies to improve your experience.",
+          dismiss: "Got it!",
+          allow: "Allow cookies",
+          deny: "Decline",
+          link: "Learn more",
+          policy: "Cookie Policy",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><script type="text/javascript" id="MathJax-script" async>MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      },
+      svg: {
+        fontCache: 'global'
+      },
+      chtml: {
+        matchFontHeight: false
+      }
+    };</script><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script><!--!--><script data-pjax src="/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="Type something..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script data-pjax src="/js/insight.js" defer></script><script data-pjax>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"Type something...","untitled":"(Untitled)","posts":"Posts","pages":"Pages","categories":"Categories","tags":"Tags"});
+        });</script><!-- hexo injector body_end start --><script src="https://unpkg.com/arcade-shelf@0.2.2/dist/index.umd.cjs" defer></script><script src="/js/arcade-shelf-init.js?v=d6b6c512" defer></script><!-- hexo injector body_end end --></body></html>

@@ -1,0 +1,76 @@
+backend:
+  name: github
+  repo: shixuan/hexo-blog
+  branch: main
+  # The authentication Worker is configured in the next setup step.
+  base_url: https://cms-auth.shixuan.me
+  auth_endpoint: auth
+
+locale: en
+site_url: https://shixuan.me
+display_url: https://shixuan.me
+publish_mode: editorial_workflow
+show_preview_links: false
+
+# Required by Decap; article images are inserted as external Markdown URLs.
+media_folder: source/uploads
+public_folder: /uploads
+
+collections:
+  - name: posts
+    label: Posts
+    label_singular: Post
+    folder: source/_posts
+    create: true
+    extension: md
+    format: yaml-frontmatter
+    slug: '{{fields.id}}'
+    summary: '{{title}} · {{date}}'
+    sortable_fields: [date, title]
+    fields:
+      - label: Title
+        name: title
+        widget: string
+      - label: Post ID
+        name: id
+        widget: string
+        hint: 'Use a unique ID, such as move-semantics. Changing it after publication changes the URL.'
+        pattern: ['^[a-z0-9][a-z0-9+-]*$', 'Use lowercase letters, numbers, hyphens, or plus signs.']
+      - label: Date
+        name: date
+        widget: datetime
+        format: 'YYYY-MM-DD HH:mm:ss'
+        date_format: 'YYYY-MM-DD'
+        time_format: 'HH:mm:ss'
+        picker_utc: false
+        hint: Changing the calendar date after publication changes the URL. Future dates do not schedule publication.
+      - label: Tags
+        name: tags
+        widget: list
+        required: false
+      - label: Categories
+        name: categories
+        widget: list
+        required: false
+        hint: Multiple categories form a category hierarchy in Hexo.
+      - label: Table of contents
+        name: toc
+        widget: boolean
+        default: true
+        required: false
+      - label: Thumbnail URL
+        name: thumbnail
+        widget: string
+        required: false
+      - label: MathJax
+        name: mathjax
+        widget: boolean
+        default: true
+        required: false
+        hint: Render LaTeX formulas in the preview. Code examples remain unchanged.
+      - label: Body
+        name: body
+        widget: markdown
+        modes: [raw]
+        editor_components: []
+        hint: 'Insert hosted images with ![description](https://...). Use <!--more--> to end the excerpt.'
