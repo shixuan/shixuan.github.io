@@ -13,14 +13,14 @@ publish_mode: editorial_workflow
 show_preview_links: false
 
 # Required by Decap; article images are inserted as external Markdown URLs.
-media_folder: apps/site/source/uploads
+media_folder: apps/blog/source/uploads
 public_folder: /uploads
 
 collections:
   - name: posts
     label: Posts
     label_singular: Post
-    folder: apps/site/source/_posts
+    folder: apps/blog/source/_posts
     create: true
     extension: md
     format: yaml-frontmatter
