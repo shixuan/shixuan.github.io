@@ -41,7 +41,7 @@
     setTimeout(() => {
         $('body > .navbar, body > .section, body > .footer').forEach(element => {
             element.style.opacity = '1';
-            element.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+            element.style.transition = 'opacity 200ms ease-out, transform 200ms ease-out';
         });
         document.querySelector('body > .navbar').style.transform = 'translateY(0)';
         root.classList.remove('is-animating');
@@ -56,8 +56,8 @@
                 setTimeout(() => {
                     element.style.opacity = '1';
                     element.style.transform = '';
-                    element.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
-                }, i * 100);
+                    element.style.transition = 'opacity 200ms ease-out, transform 200ms ease-out';
+                }, i * 40);
                 i++;
             });
         });
@@ -70,7 +70,7 @@
                 if (target) {
                     target.scrollIntoView({ behavior: 'smooth' });
                 }
-            }, i * 100);
+            }, i * 40);
         }
     });
 }());
